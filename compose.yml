@@ -5,3 +5,7 @@ services:
     container_name: marina-api
     ports:
       - "8080:8080"
+    volumes:
+      - type: bind
+        source: /home/luke/Documents/projects/volumes/marina-api/data
+        target: /data
