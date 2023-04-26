@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController("/marina")
+@CrossOrigin
 @Slf4j
 public class BoatSearchController {
     @Autowired
@@ -45,6 +47,7 @@ public class BoatSearchController {
     }
 
     @GetMapping("/boats")
+    @CrossOrigin(origins = "http://marina-ui")
     public Page<Boat> getAllSavedBoats(@PageableDefault(size = Integer.MAX_VALUE)
                                        @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
         return topYachtLoader.getAllBoats(page);
@@ -54,6 +57,7 @@ public class BoatSearchController {
             value = "/boat-photo",
             produces = MediaType.IMAGE_PNG_VALUE
     )
+    @CrossOrigin(origins = "http://marina-ui")
     public ResponseEntity<byte[]> getImageWithMediaType(@RequestParam Long id) throws IOException {
         File photoFile = new File(photoDataPath + id + ".png");
         InputStream in = new FileInputStream(photoFile);
@@ -64,11 +68,13 @@ public class BoatSearchController {
     }
 
     @GetMapping(value = "/search")
+    @CrossOrigin(origins = "http://marina-ui")
     public List<BoatSearchResult> searchForBoats(@RequestParam String search) {
         return topYachtLoader.findBoats(search);
     }
 
     @GetMapping("/boat-details")
+    @CrossOrigin(origins = "http://marina-ui")
     public ResponseEntity<Boat> getBoatDetails(@RequestParam Long boatId) {
         return ResponseEntity.ok(topYachtLoader.getBoatDetails(boatId));
     }
