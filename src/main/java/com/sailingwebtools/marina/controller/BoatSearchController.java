@@ -50,6 +50,7 @@ public class BoatSearchController {
     @CrossOrigin(origins = "http://marina-ui")
     public Page<Boat> getAllSavedBoats(@PageableDefault(size = Integer.MAX_VALUE)
                                        @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
+        log.info("/api/boats {}", page);
         return topYachtLoader.getAllBoats(page);
     }
 
@@ -60,6 +61,7 @@ public class BoatSearchController {
     @CrossOrigin(origins = "http://marina-ui")
     public ResponseEntity<byte[]> getImageWithMediaType(@RequestParam Long id) throws IOException {
         File photoFile = new File(photoDataPath + id + ".png");
+        log.info("/api/boat-photo {}", photoFile.getAbsolutePath());
         InputStream in = new FileInputStream(photoFile);
         if (in == null) {
             return ResponseEntity.ok().build();
@@ -70,12 +72,14 @@ public class BoatSearchController {
     @GetMapping(value = "/search")
     @CrossOrigin(origins = "http://marina-ui")
     public List<BoatSearchResult> searchForBoats(@RequestParam String search) {
+        log.info("/api/search?search={}", search);
         return topYachtLoader.findBoats(search);
     }
 
     @GetMapping("/boat-details")
     @CrossOrigin(origins = "http://marina-ui")
     public ResponseEntity<Boat> getBoatDetails(@RequestParam Long boatId) {
+        log.info("/api/boat-details?boatId={}", boatId);
         return ResponseEntity.ok(topYachtLoader.getBoatDetails(boatId));
     }
 
