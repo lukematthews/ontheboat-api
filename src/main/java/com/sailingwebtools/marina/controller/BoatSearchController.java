@@ -3,6 +3,7 @@ package com.sailingwebtools.marina.controller;
 import com.sailingwebtools.marina.model.Boat;
 import com.sailingwebtools.marina.model.dto.BoatSearchResult;
 import com.sailingwebtools.marina.service.TopYachtLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 @RestController("/marina")
+@Slf4j
 public class BoatSearchController {
     @Autowired
     private TopYachtLoader topYachtLoader;
@@ -51,8 +55,8 @@ public class BoatSearchController {
             produces = MediaType.IMAGE_PNG_VALUE
     )
     public ResponseEntity<byte[]> getImageWithMediaType(@RequestParam Long id) throws IOException {
-        InputStream in = getClass()
-                .getResourceAsStream(photoDataPath + id + ".png");
+        File photoFile = new File(photoDataPath + id + ".png");
+        InputStream in = new FileInputStream(photoFile);
         if (in == null) {
             return ResponseEntity.ok().build();
         }
