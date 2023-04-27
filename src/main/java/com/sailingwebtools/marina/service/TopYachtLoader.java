@@ -4,7 +4,6 @@ import com.sailingwebtools.marina.model.Boat;
 import com.sailingwebtools.marina.model.BoatDetails;
 import com.sailingwebtools.marina.model.Handicap;
 import com.sailingwebtools.marina.model.HandicapType;
-import com.sailingwebtools.marina.model.dto.BoatSearchResult;
 import com.sailingwebtools.marina.repository.BoatDetailsRepository;
 import com.sailingwebtools.marina.repository.BoatRepository;
 import com.sailingwebtools.marina.repository.HandicapRepository;
@@ -252,7 +251,7 @@ public class TopYachtLoader {
         return Flux.just(null);
     }
 
-    public List<BoatSearchResult> findBoats(String search) {
+    public List<Boat> findBoats(String search) {
         return boatRepository.findBoatByNameSailNumberContact(search == null ? "" : search.toUpperCase());
     }
 }

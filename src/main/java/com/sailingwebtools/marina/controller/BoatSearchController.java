@@ -1,7 +1,6 @@
 package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Boat;
-import com.sailingwebtools.marina.model.dto.BoatSearchResult;
 import com.sailingwebtools.marina.service.TopYachtLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -71,7 +70,7 @@ public class BoatSearchController {
 
     @GetMapping(value = "/search")
     @CrossOrigin(origins = "http://marina-ui")
-    public List<BoatSearchResult> searchForBoats(@RequestParam String search) {
+    public List<Boat> searchForBoats(@RequestParam String search) {
         log.info("/api/search?search={}", search);
         return topYachtLoader.findBoats(search);
     }
