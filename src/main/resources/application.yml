@@ -4,14 +4,13 @@ marina:
     boat-detail: "http://www.topyacht.com.au/mt/mt_pub.php?boid="
     boat-photo: "http://www.topyacht.com.au/mt/mt_photo.php?boid="
   photos:
-    path: "/Users/matth/Documents/projects/marina-api/data/photos-combined/"
+    path: "/data/photos-combined/"
 server:
   servlet:
     context-path: "/api"
 spring:
   datasource:
-    #    url: jdbc:h2:file:./data/backend.db;DB_CLOSE_DELAY=-1
-    url: jdbc:h2:file:/Users/matth/Documents/backend.db;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:./data/backend.db;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password: sa
