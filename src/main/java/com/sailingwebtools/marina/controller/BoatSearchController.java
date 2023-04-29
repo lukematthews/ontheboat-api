@@ -75,6 +75,14 @@ public class BoatSearchController {
         return topYachtLoader.findBoats(search);
     }
 
+    @GetMapping(value = "/search-page")
+    @CrossOrigin(origins = "http://marina-ui")
+    public Page<Boat> searchForBoatsPage(@RequestParam String search, @PageableDefault(size = Integer.MAX_VALUE)
+    @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
+        log.info("/api/search?search={}", search);
+        return topYachtLoader.findBoats(search, page);
+    }
+
     @GetMapping("/boat-details")
     @CrossOrigin(origins = "http://marina-ui")
     public ResponseEntity<Boat> getBoatDetails(@RequestParam Long boatId) {

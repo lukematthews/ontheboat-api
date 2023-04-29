@@ -254,4 +254,8 @@ public class TopYachtLoader {
     public List<Boat> findBoats(String search) {
         return boatRepository.findBoatByNameSailNumberContact(search == null ? "" : search.toUpperCase());
     }
+
+    public Page<Boat> findBoats(String search, Pageable pageable) {
+        return boatRepository.findBySearchTerm(search, pageable);
+    }
 }
