@@ -39,7 +39,7 @@ public class BoatDetails {
     private String hullMaterial;
     @Column
     private String hullColour;
-    @Column(length = 4096)
+    @Column(length = 8192)
     private String bio;
 
     @ToString.Include

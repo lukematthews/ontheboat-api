@@ -1,6 +1,7 @@
 package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Boat;
+import com.sailingwebtools.marina.service.BoatService;
 import com.sailingwebtools.marina.service.TopYachtLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -31,6 +32,8 @@ import java.util.List;
 public class BoatSearchController {
     @Autowired
     private TopYachtLoader topYachtLoader;
+    @Autowired
+    private BoatService boatService;
 
     @Value("${marina.photos.path}")
     private String photoDataPath;
@@ -50,7 +53,7 @@ public class BoatSearchController {
     public Page<Boat> getAllSavedBoats(@PageableDefault(size = Integer.MAX_VALUE)
                                        @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
         log.info("/api/boats {}", page);
-        return topYachtLoader.getAllBoats(page);
+        return boatService.getAllBoats(page);
     }
 
     @GetMapping(
@@ -72,7 +75,7 @@ public class BoatSearchController {
     @CrossOrigin(origins = "http://marina-ui")
     public List<Boat> searchForBoats(@RequestParam String search) {
         log.info("/api/search?search={}", search);
-        return topYachtLoader.findBoats(search);
+        return boatService.findBoats(search);
     }
 
     @GetMapping(value = "/search-page")
@@ -80,7 +83,7 @@ public class BoatSearchController {
     public Page<Boat> searchForBoatsPage(@RequestParam String search, @PageableDefault(size = Integer.MAX_VALUE)
     @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
         log.info("/api/search?search={}", search);
-        return topYachtLoader.findBoats(search, page);
+        return boatService.findBoats(search, page);
     }
 
     @GetMapping("/boat-details")
@@ -106,5 +109,4 @@ public class BoatSearchController {
     public Flux<Boat> processBoatDetails() {
         return topYachtLoader.processBoatDetails();
     }
-
 }

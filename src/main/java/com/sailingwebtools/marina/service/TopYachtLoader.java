@@ -16,9 +16,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -85,10 +82,11 @@ public class TopYachtLoader {
 
     @SneakyThrows
     private List<Boat> processPage(Function<Element, Boat> processor) {
-        Document doc = Jsoup.connect(boatListUrl).get();
+        Document doc = Jsoup.connect(boatListUrl).maxBodySize(0).get();
         String title = doc.title();
         log.info(title);
         Elements boatTable = doc.select("#boats > tbody > tr");
+
         List<Boat> boatList = boatTable.stream()
                 .filter(element -> element.childrenSize() > 4)
                 .parallel()
@@ -118,17 +116,18 @@ public class TopYachtLoader {
     private Boat loadBoat(Element element) {
         String id = getId(element);
         int currentItem = count.incrementAndGet();
+        boolean archived = element.child(4).text().equals("Y") ? true : false;
         Boat boat = Boat.builder()
                 .id(Long.valueOf(id))
                 .boatName(element.child(0).text())
                 .sailNumber(element.child(1).text())
                 .contact(element.child(2).text())
                 .design(element.child(3).text())
-                .archived(Boolean.valueOf(element.child(4).text()))
+                .archived(archived)
                 .build();
         boatRepository.save(boat);
         loadBoatDetailsForBoat(boat);
-        if (currentItem % 10 == 0) {
+        if (currentItem % 20 == 0) {
             log.info("" + currentItem);
         }
         return boat;
@@ -172,7 +171,7 @@ public class TopYachtLoader {
                 .hullMaterial(textFrom(doc, "#21"))
                 .rig(textFrom(doc, "#24"))
                 .hullColour(textFrom(doc, "#26"))
-                .bio(textFrom(doc, "#39"))
+                .bio(textFromDocumentWithNewlines(doc, "#39"))
                 .build();
 
         boatDetailsRepository.save(boatDetails);
@@ -219,7 +218,7 @@ public class TopYachtLoader {
         boatRepository.findAll().stream().parallel().forEach(boat -> {
             int currentCount = count.incrementAndGet();
             saveImage(boat.getId());
-            if (currentCount % 10 == 0) {
+            if (currentCount % 20 == 0) {
                 log.info("" + currentCount);
             }
         });
@@ -239,23 +238,22 @@ public class TopYachtLoader {
     }
 
     private String textFrom(Document doc, String selector) {
+        // the text contains <br> tags. We need to pick those up as newlines.
         return doc.select(selector).text();
     }
 
-    public Page<Boat> getAllBoats(Pageable page) {
-        log.info(page.toString());
-        return boatRepository.findAll(Example.of(Boat.builder().archived(false).build()), page);
+    private String textFromDocumentWithNewlines(Document doc, String selector) {
+        // the text contains <br> tags. We need to pick those up as newlines.
+        Optional<Element> element = doc.select(selector).stream().findFirst();
+        if (element.isPresent()) {
+            return element.get().html().replaceAll("<br>", "");
+        }
+        return null;
     }
+
 
     public Flux<Boat> processBoatDetails() {
         return Flux.just(null);
     }
 
-    public List<Boat> findBoats(String search) {
-        return boatRepository.findBoatByNameSailNumberContact(search == null ? "" : search.toUpperCase());
-    }
-
-    public Page<Boat> findBoats(String search, Pageable pageable) {
-        return boatRepository.findBySearchTerm(search, pageable);
-    }
 }
