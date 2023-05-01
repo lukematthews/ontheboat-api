@@ -1,5 +1,6 @@
 package com.sailingwebtools.marina.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class Handicap {
     @ToString.Exclude
     private Boat boat;
     @Column
+    @JsonIgnore
     private HandicapType handicapType;
     @Column
     private String rating;
@@ -35,6 +37,10 @@ public class Handicap {
     private String certificate;
     @Column
     private LocalDate expiryDate;
+
+    public String getType() {
+        return handicapType.getLabel();
+    }
 
     @ToString.Include
     public String getBoat() {

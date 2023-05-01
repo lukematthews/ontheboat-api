@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Builder
 @Data
@@ -20,6 +22,9 @@ public class Crew {
     private Long id;
 
     @Column
+    private UUID uuid;
+
+    @Column
     private String firstName;
     @Column
     private String lastName;
@@ -27,5 +32,5 @@ public class Crew {
     private String email;
     @Column
     private String mobile;
-    
+
 }

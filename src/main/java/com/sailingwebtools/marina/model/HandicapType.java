@@ -15,4 +15,8 @@ public enum HandicapType {
     HandicapType(String label) {
         this.label = label;
     }
+
+    public String toString() {
+        return label;
+    }
 }
