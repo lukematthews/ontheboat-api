@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,10 +17,10 @@ public class Onboard {
     @Id
     @GeneratedValue
     private Long id;
-    
-    @Column
+
+    @ManyToOne
     private Boat boat;
-    @Column
+    @ManyToOne
     private Crew crew;
     @Column
     private LocalDateTime timeOn;
