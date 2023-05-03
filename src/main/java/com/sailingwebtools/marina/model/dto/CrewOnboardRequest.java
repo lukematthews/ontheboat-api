@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CrewOnboardRequest {
+    private String uuid;
     private Long boatId;
     private String firstName;
     private String lastName;
