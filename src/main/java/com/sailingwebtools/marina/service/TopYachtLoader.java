@@ -250,10 +250,4 @@ public class TopYachtLoader {
         }
         return null;
     }
-
-
-    public Flux<Boat> processBoatDetails() {
-        return Flux.just(null);
-    }
-
 }

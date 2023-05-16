@@ -39,7 +39,7 @@ public class Handicap {
     private LocalDate expiryDate;
 
     public String getType() {
-        return handicapType.getLabel();
+        return handicapType == null ? null : handicapType.getLabel();
     }
 
     @ToString.Include

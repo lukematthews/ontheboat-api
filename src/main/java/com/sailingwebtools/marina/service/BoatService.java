@@ -29,4 +29,10 @@ public class BoatService {
     public Page<Boat> findBoats(String search, Pageable pageable) {
         return boatRepository.findBySearchTerm(search, pageable);
     }
+
+    public Boat getBoatDetails(Long boatId) {
+        return boatRepository.findById(boatId).orElse(null);
+
+    }
+
 }

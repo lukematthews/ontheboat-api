@@ -1,5 +1,6 @@
 package com.sailingwebtools.marina.model.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import lombok.Data;
 @Builder
 public class CrewOnboardRequest {
     private String uuid;
+    @NotNull(message = "A boat to sign on to must be provided")
     private Long boatId;
     private String firstName;
     private String lastName;
