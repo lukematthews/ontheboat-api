@@ -4,14 +4,16 @@ import com.sailingwebtools.marina.model.Boat;
 import com.sailingwebtools.marina.model.Crew;
 import com.sailingwebtools.marina.model.Onboard;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
+import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
+import com.sailingwebtools.marina.model.dto.SignUpRequest;
 import com.sailingwebtools.marina.model.dto.SignonDto;
-import com.sailingwebtools.marina.model.dto.UsersRequest;
 import com.sailingwebtools.marina.repository.BoatRepository;
 import com.sailingwebtools.marina.repository.CrewRepository;
 import com.sailingwebtools.marina.repository.OnboardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -26,6 +28,9 @@ public class CrewService {
     private BoatRepository boatRepository;
     @Autowired
     private OnboardRepository onboardRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
@@ -75,14 +80,26 @@ public class CrewService {
         return crewRepository.findById(id).orElse(null);
     }
 
-    public Crew register(UsersRequest user) {
+    public Crew register(SignUpRequest user) {
         Crew crew = Crew.builder().email(user.getEmail())
-                .firstName(user.getFirst_name())
-                .lastName(user.getLast_name())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
                 .roles("ROLE_USER")
-                .password(new BCryptPasswordEncoder().encode(user.getPassword()))
+                .password(passwordEncoder.encode(user.getPassword()))
                 .build();
         return crewRepository.save(crew);
+    }
+
+    public CrewProfileResponse getProfile(String username) {
+        Crew crew = crewRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(""));
+        return CrewProfileResponse.builder()
+                .username(crew.getUsername())
+                .firstName(crew.getFirstName())
+                .lastName(crew.getLastName())
+                .ownedBoats(crew.getOwnedBoats().stream().toList())
+                .build();
+
     }
 
 //    public SignUpResponse signUp(SignUpRequest signUpRequest) {

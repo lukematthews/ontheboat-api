@@ -2,6 +2,7 @@ package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Crew;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
+import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
 import com.sailingwebtools.marina.model.dto.SignonDto;
 import com.sailingwebtools.marina.service.CrewService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -49,11 +50,11 @@ public class CrewController {
     }
 
     @GetMapping("/profile")
-    @PreAuthorize("hasRole('ROLE_CREW')")
-    public ResponseEntity getProfileForUser() {
-        Object principal1 = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ResponseEntity.ok(principal1);
-//        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-//        return ResponseEntity.ok(crewService.findCrewById(userDetails.getId()));
+//    @PreAuthorize("hasRole('ROLE_CREW')")
+    public ResponseEntity<CrewProfileResponse> getProfileForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CrewProfileResponse profileResponse = crewService.getProfile(authentication.getName());
+
+        return ResponseEntity.ok(profileResponse);
     }
 }

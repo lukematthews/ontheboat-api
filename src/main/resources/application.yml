@@ -42,3 +42,7 @@ application:
       refresh-token:
         expiration: 604800000 # 7 days
 
+
+jwt:
+  private.key: classpath:app.key
+  public.key: classpath:app.pub

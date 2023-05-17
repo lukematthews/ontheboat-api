@@ -64,12 +64,12 @@ public class Crew implements UserDetails {
 
     @Override
     public String getPassword() {
-        return getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return username;
     }
 
     @Override
