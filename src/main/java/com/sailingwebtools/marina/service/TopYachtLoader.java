@@ -17,7 +17,6 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -59,13 +58,7 @@ public class TopYachtLoader {
 
     private static void accept(Long consumer) {
     }
-
-    public Flux<Long> asyncBoatLoad() {
-        Flux<Long> boatFlux = Flux.fromIterable(boatRepository.findAll()).map(boat -> boat.getId());
-        boatFlux.subscribe(TopYachtLoader::accept);
-
-        return boatFlux;
-    }
+    
 
     @SneakyThrows
     public List<Boat> loadFromTopYacht() {
