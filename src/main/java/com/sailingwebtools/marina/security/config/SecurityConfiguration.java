@@ -55,6 +55,7 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(toH2Console()).permitAll()
                         .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/marina/**").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin().and()
                 .csrf().disable()
