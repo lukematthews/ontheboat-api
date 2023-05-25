@@ -60,7 +60,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/marina/**").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin().and()
-                .csrf().disable()
+                .csrf().ignoringRequestMatchers(toH2Console()).disable()
                 .httpBasic(Customizer.withDefaults())
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
