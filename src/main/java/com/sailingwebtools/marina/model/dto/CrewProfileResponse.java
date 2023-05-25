@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Builder
 public class CrewProfileResponse {
+    private Long id;
     private String username;
     private String firstName;
     private String lastName;

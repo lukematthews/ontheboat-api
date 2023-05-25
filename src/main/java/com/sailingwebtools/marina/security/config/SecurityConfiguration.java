@@ -34,6 +34,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -51,8 +53,10 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-//                        .requestMatchers(toH2Console()).permitAll()
+                        .requestMatchers(toH2Console()).permitAll()
                         .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/auth/token").permitAll()
+                        .requestMatchers("/crew/sign-on").permitAll()
                         .requestMatchers("/marina/**").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin().and()

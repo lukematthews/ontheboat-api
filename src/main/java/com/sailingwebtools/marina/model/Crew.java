@@ -63,6 +63,7 @@ public class Crew implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public String getPassword() {
         return password;
     }

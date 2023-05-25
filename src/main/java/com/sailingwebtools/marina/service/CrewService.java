@@ -59,6 +59,7 @@ public class CrewService {
             crew = Crew.builder().build();
 //            if (crewOnboardRequest.isRememberMe()) {
             crew.setUuid(UUID.randomUUID());
+            crew.setRoles("ROLE_USER");
 //            }
             BeanUtils.copyProperties(crewOnboardRequest, crew);
             crew = crewRepository.save(crew);
@@ -94,6 +95,7 @@ public class CrewService {
     public CrewProfileResponse getProfile(String username) {
         Crew crew = crewRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(""));
         return CrewProfileResponse.builder()
+                .id(crew.getId())
                 .username(crew.getUsername())
                 .firstName(crew.getFirstName())
                 .lastName(crew.getLastName())
