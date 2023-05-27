@@ -1,6 +1,7 @@
 package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Crew;
+import com.sailingwebtools.marina.model.dto.ChangeOwnerRequest;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
 import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
 import com.sailingwebtools.marina.model.dto.SignonDto;
@@ -58,5 +59,10 @@ public class CrewController {
         CrewProfileResponse profileResponse = crewService.getProfile(authentication.getName());
 
         return ResponseEntity.ok(profileResponse);
+    }
+
+    @PostMapping(value = "/request-ownership-change", consumes = "application/json")
+    public ResponseEntity changeOwner(Authentication authentication, @RequestBody ChangeOwnerRequest changeOwnerRequest) {
+        return ResponseEntity.ok().build();
     }
 }
