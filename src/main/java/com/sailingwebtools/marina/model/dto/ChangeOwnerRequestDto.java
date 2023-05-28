@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ChangeOwnerRequest {
+public class ChangeOwnerRequestDto {
     private Long boatId;
     private Long crewId;
     private ChangeOwnerRequestType requestType;

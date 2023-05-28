@@ -1,12 +1,16 @@
 package com.sailingwebtools.marina.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,6 +58,10 @@ public class Crew implements UserDetails {
 
     @Column(name = "roles", nullable = false)
     private String roles;
+
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "crew_id")
+    private Set<ChangeOwnerRequest> changeOwnerRequests;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

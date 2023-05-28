@@ -39,7 +39,7 @@ public class BoatSearchController {
     @GetMapping("/boats")
     @CrossOrigin(origins = "http://marina-ui")
     public Page<Boat> getAllSavedBoats(@PageableDefault(size = Integer.MAX_VALUE)
-                                       @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
+    @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
         log.info("/api/boats {}", page);
         return boatService.getAllBoats(page);
     }
@@ -81,5 +81,4 @@ public class BoatSearchController {
         log.info("/api/boat-details?boatId={}", boatId);
         return ResponseEntity.ok(boatService.getBoatDetails(boatId));
     }
-
 }

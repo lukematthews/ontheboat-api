@@ -1,23 +1,31 @@
 package com.sailingwebtools.marina.service;
 
 import com.sailingwebtools.marina.model.Boat;
+import com.sailingwebtools.marina.model.ChangeOwnerRequest;
 import com.sailingwebtools.marina.model.Crew;
 import com.sailingwebtools.marina.model.Onboard;
+import com.sailingwebtools.marina.model.dto.ChangeOwnerRequestDto;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
 import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
 import com.sailingwebtools.marina.model.dto.SignUpRequest;
 import com.sailingwebtools.marina.model.dto.SignonDto;
 import com.sailingwebtools.marina.repository.BoatRepository;
+import com.sailingwebtools.marina.repository.ChangeOwnerRequestRepository;
 import com.sailingwebtools.marina.repository.CrewRepository;
 import com.sailingwebtools.marina.repository.OnboardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.sailingwebtools.marina.model.dto.ChangeOwnerRequestStatus.SUBMITTED;
 
 @Service
 public class CrewService {
@@ -32,20 +40,8 @@ public class CrewService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
-
-//    @Autowired
-//    private RoleRepository roleRepository;
-
-//    @PostConstruct
-//    public void initialise() {
-//        if (roleRepository.findAll().isEmpty()) {
-//            Arrays.stream(RoleTypes.values()).forEach(r -> {
-//                roleRepository.save(Role.builder().name(r).build());
-//            });
-//        }
-//    }
+    @Autowired
+    private ChangeOwnerRequestRepository changeOwnerRequestRepository;
 
     public SignonDto signOn(CrewOnboardRequest crewOnboardRequest) {
 
@@ -102,6 +98,27 @@ public class CrewService {
                 .ownedBoats(crew.getOwnedBoats().stream().toList())
                 .build();
 
+    }
+
+
+    public void submitChangeOwnerRequest(String crewName, ChangeOwnerRequestDto changeOwnerRequest) throws OwnerShipChangeException {
+        // is there already a request?
+        Crew requestingCrew = crewRepository.findByUsername(crewName).orElseThrow(() -> new OwnerShipChangeException("Submitting crew not found"));
+        Boat requestedBoat = boatRepository.findById(changeOwnerRequest.getBoatId()).orElseThrow(() -> new OwnerShipChangeException("Boat not found"));
+
+        List<ChangeOwnerRequest> existingRequests = changeOwnerRequestRepository.findAll(Example.of(ChangeOwnerRequest.builder().boat(requestedBoat).crew(requestingCrew).build()));
+        if (existingRequests.isEmpty() == false) {
+            throw new OwnerShipChangeException("Ownership change request already exists");
+        }
+        ChangeOwnerRequest request = ChangeOwnerRequest.builder()
+                .status(SUBMITTED)
+                .requestType(changeOwnerRequest.getRequestType())
+                .crew(requestingCrew)
+                .boat(requestedBoat)
+                .submitted(LocalDateTime.now())
+                .lastActioned(LocalDateTime.now())
+                .build();
+        changeOwnerRequestRepository.save(request);
     }
 
 //    public SignUpResponse signUp(SignUpRequest signUpRequest) {

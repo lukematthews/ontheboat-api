@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -27,6 +28,7 @@ import java.util.Set;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Boat {
     @Id
+    @GeneratedValue
     private Long id;
     @Column
     private String boatName;
@@ -42,6 +44,10 @@ public class Boat {
     private BoatDetails boatDetails;
     @OneToMany(cascade = CascadeType.REMOVE)
     private List<Handicap> handicaps;
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "boat_id")
+    private List<ChangeOwnerRequest> changeOwnerRequests;
+
     @ManyToMany
     @JoinTable(name = "boat_owners",
             joinColumns = @JoinColumn(name = "boat_id"),

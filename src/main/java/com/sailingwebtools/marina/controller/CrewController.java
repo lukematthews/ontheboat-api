@@ -1,11 +1,12 @@
 package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Crew;
-import com.sailingwebtools.marina.model.dto.ChangeOwnerRequest;
+import com.sailingwebtools.marina.model.dto.ChangeOwnerRequestDto;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
 import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
 import com.sailingwebtools.marina.model.dto.SignonDto;
 import com.sailingwebtools.marina.service.CrewService;
+import com.sailingwebtools.marina.service.OwnerShipChangeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -62,7 +63,12 @@ public class CrewController {
     }
 
     @PostMapping(value = "/request-ownership-change", consumes = "application/json")
-    public ResponseEntity changeOwner(Authentication authentication, @RequestBody ChangeOwnerRequest changeOwnerRequest) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity changeOwner(Authentication authentication, @RequestBody ChangeOwnerRequestDto changeOwnerRequest) {
+        try {
+            crewService.submitChangeOwnerRequest(authentication.getName(), changeOwnerRequest);
+            return ResponseEntity.ok().build();
+        } catch (OwnerShipChangeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

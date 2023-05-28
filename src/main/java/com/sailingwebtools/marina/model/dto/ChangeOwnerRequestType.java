@@ -9,8 +9,8 @@ import lombok.Getter;
 public enum ChangeOwnerRequestType {
     SOLE_OWNER("sole"),
     PARTNER("partner"),
-    OTHER_PARTY("other");
-
+    OTHER_PARTY("other"),
+    REMOVE("remove");
     @Getter
     @JsonValue
     private String type;
