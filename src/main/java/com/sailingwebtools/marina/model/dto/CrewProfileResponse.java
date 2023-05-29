@@ -1,6 +1,5 @@
 package com.sailingwebtools.marina.model.dto;
 
-import com.sailingwebtools.marina.model.Boat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,5 +14,5 @@ public class CrewProfileResponse {
     private String firstName;
     private String lastName;
     @Builder.Default
-    private List<Boat> ownedBoats = new ArrayList<>();
+    private List<ProfileBoatResponse> ownedBoats = new ArrayList<>();
 }

@@ -7,6 +7,7 @@ import com.sailingwebtools.marina.model.Onboard;
 import com.sailingwebtools.marina.model.dto.ChangeOwnerRequestDto;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
 import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
+import com.sailingwebtools.marina.model.dto.ProfileBoatResponse;
 import com.sailingwebtools.marina.model.dto.SignUpRequest;
 import com.sailingwebtools.marina.model.dto.SignonDto;
 import com.sailingwebtools.marina.repository.BoatRepository;
@@ -95,9 +96,8 @@ public class CrewService {
                 .username(crew.getUsername())
                 .firstName(crew.getFirstName())
                 .lastName(crew.getLastName())
-                .ownedBoats(crew.getOwnedBoats().stream().toList())
+                .ownedBoats(crew.getOwnedBoats().stream().map(b -> ProfileBoatResponse.builder().boatName(b.getBoatName()).id(b.getId()).build()).toList())
                 .build();
-
     }
 
 

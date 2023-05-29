@@ -56,7 +56,7 @@ public class BoatSearchController {
             }
             return ResponseEntity.ok(IOUtils.toByteArray(in));
         } catch (FileNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok().build();
         }
     }
 

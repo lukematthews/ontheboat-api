@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -19,6 +18,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Set;
+
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.EAGER;
 
 @Data
 @Builder
@@ -47,10 +49,6 @@ public class Boat {
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "boat_id")
     private List<ChangeOwnerRequest> changeOwnerRequests;
-
-    @ManyToMany
-    @JoinTable(name = "boat_owners",
-            joinColumns = @JoinColumn(name = "boat_id"),
-            inverseJoinColumns = @JoinColumn(name = "owners_id"))
+    @ManyToMany(mappedBy = "ownedBoats", fetch = EAGER, cascade = ALL)
     private Set<Crew> owners;
 }

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -26,12 +26,15 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.EAGER;
+
 @Entity
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"ownedBoats"})
 @ToString
 public class Crew implements UserDetails {
     @Id
@@ -52,14 +55,21 @@ public class Crew implements UserDetails {
     @Column
     @JsonIgnore
     private String password;
-    @ManyToMany(mappedBy = "owners")
     @ToString.Exclude
+    @ManyToMany(fetch = EAGER, cascade = ALL)
+    @JoinTable(
+            name = "boat_owners",
+            joinColumns = @JoinColumn(name = "crew_id"),
+            inverseJoinColumns = @JoinColumn(name = "boat_id"))
     private Set<Boat> ownedBoats;
 
     @Column(name = "roles", nullable = false)
     private String roles;
 
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @Column
+    private CrewStatus status;
+
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = EAGER)
     @JoinColumn(name = "crew_id")
     private Set<ChangeOwnerRequest> changeOwnerRequests;
 
