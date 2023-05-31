@@ -30,11 +30,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 @EnableWebSecurity
@@ -53,14 +52,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(toH2Console()).permitAll()
+//                        .requestMatchers(toH2Console()).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
                         .requestMatchers("/auth/register").permitAll()
                         .requestMatchers("/auth/token").permitAll()
                         .requestMatchers("/crew/sign-on").permitAll()
                         .requestMatchers("/marina/**").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin().and()
-                .csrf().ignoringRequestMatchers(toH2Console()).and()
+//                .csrf().ignoringRequestMatchers(toH2Console()).and()
                 .csrf().disable()
                 .httpBasic(Customizer.withDefaults())
                 .logout().logoutUrl("/auth/logout").deleteCookies("otb").and()
