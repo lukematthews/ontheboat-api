@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
 @Entity
@@ -34,7 +33,7 @@ import static jakarta.persistence.FetchType.EAGER;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"ownedBoats"})
+@EqualsAndHashCode(exclude = {"ownedBoats", "changeOwnerRequests"})
 @ToString
 public class Crew implements UserDetails {
     @Id
@@ -56,11 +55,11 @@ public class Crew implements UserDetails {
     @JsonIgnore
     private String password;
     @ToString.Exclude
-    @ManyToMany(fetch = EAGER, cascade = ALL)
+    @ManyToMany(fetch = EAGER)
     @JoinTable(
             name = "boat_owners",
-            joinColumns = @JoinColumn(name = "crew_id"),
-            inverseJoinColumns = @JoinColumn(name = "boat_id"))
+            joinColumns = @JoinColumn(name = "crew_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "boat_id", referencedColumnName = "id"))
     private Set<Boat> ownedBoats;
 
     @Column(name = "roles", nullable = false)

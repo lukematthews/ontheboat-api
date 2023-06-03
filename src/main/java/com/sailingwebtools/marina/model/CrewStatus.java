@@ -1,17 +1,17 @@
 package com.sailingwebtools.marina.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
 public enum CrewStatus {
 
-    PLACEHOLDER("placeholder"),
-    ACTIVE("active"),
-    INACTIVE("inactive");
+    PLACEHOLDER("Placeholder"),
+    ACTIVE("Active"),
+    INACTIVE("Inactive");
 
-    @Getter
+    @JsonValue
     private String status;
 }

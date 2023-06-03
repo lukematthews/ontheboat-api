@@ -1,8 +1,12 @@
 package com.sailingwebtools.marina.service;
 
 import com.sailingwebtools.marina.model.Boat;
+import com.sailingwebtools.marina.model.Crew;
+import com.sailingwebtools.marina.model.dto.BoatDto;
+import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
 import com.sailingwebtools.marina.repository.BoatRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -10,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,8 +32,34 @@ public class BoatService {
         return boatRepository.findBoatByNameSailNumberContact(search == null ? "" : search.toUpperCase());
     }
 
-    public Page<Boat> findBoats(String search, Pageable pageable) {
-        return boatRepository.findBySearchTerm(search, pageable);
+    public Page<BoatDto> findBoats(String search, Pageable pageable) {
+        Page<Boat> boats = boatRepository.findBySearchTerm(search, pageable);
+        Page<BoatDto> boatDtoPage = boats.map(boat -> {
+            BoatDto boatDto = new BoatDto();
+            BeanUtils.copyProperties(boat, boatDto);
+            boatDto.setOwners(boat.getOwners().stream()
+                    .map(owner -> {
+                        CrewProfileResponse crewDto = new CrewProfileResponse();
+                        BeanUtils.copyProperties(owner, crewDto);
+                        return crewDto;
+                    }).collect(Collectors.toSet()));
+            boatDto.setContact(boat.getOwners().stream()
+                    .map(this::renderName)
+                    .collect(Collectors.joining(", ")));
+            return boatDto;
+        });
+        return boatDtoPage;
+    }
+
+    private String renderName(Crew crew) {
+        StringBuffer name = new StringBuffer();
+        if (!Objects.isNull(crew.getFirstName())) {
+            name.append(crew.getFirstName());
+        }
+        if (!Objects.isNull(crew.getLastName())) {
+            name.append(" " + crew.getLastName());
+        }
+        return name.toString();
     }
 
     public Boat getBoatDetails(Long boatId) {

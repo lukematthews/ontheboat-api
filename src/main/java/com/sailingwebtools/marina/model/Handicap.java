@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -27,6 +28,7 @@ public class Handicap {
 
     @ManyToOne
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Boat boat;
     @Column
     @JsonIgnore

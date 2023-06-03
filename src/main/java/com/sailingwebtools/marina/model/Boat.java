@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -19,7 +20,6 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
 @Data
@@ -44,11 +44,16 @@ public class Boat {
     private Boolean archived;
     @OneToOne(cascade = CascadeType.REMOVE)
     private BoatDetails boatDetails;
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = EAGER)
     private List<Handicap> handicaps;
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = EAGER)
     @JoinColumn(name = "boat_id")
     private List<ChangeOwnerRequest> changeOwnerRequests;
-    @ManyToMany(mappedBy = "ownedBoats", fetch = EAGER, cascade = ALL)
+    //    @ManyToMany(mappedBy = "ownedBoats", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = EAGER)
+    @JoinTable(
+            name = "boat_owners",
+            joinColumns = @JoinColumn(name = "boat_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "crew_id", referencedColumnName = "id"))
     private Set<Crew> owners;
 }

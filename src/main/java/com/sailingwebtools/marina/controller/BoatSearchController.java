@@ -1,6 +1,7 @@
 package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Boat;
+import com.sailingwebtools.marina.model.dto.BoatDto;
 import com.sailingwebtools.marina.service.BoatService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -69,7 +70,7 @@ public class BoatSearchController {
 
     @GetMapping(value = "/search-page")
     @CrossOrigin(origins = "http://marina-ui")
-    public Page<Boat> searchForBoatsPage(@RequestParam String search, @PageableDefault(size = Integer.MAX_VALUE)
+    public Page<BoatDto> searchForBoatsPage(@RequestParam String search, @PageableDefault(size = Integer.MAX_VALUE)
     @SortDefault.SortDefaults({@SortDefault(sort = "boatName", direction = Sort.Direction.ASC)}) Pageable page) {
         log.info("/api/search?search={}", search);
         return boatService.findBoats(search, page);

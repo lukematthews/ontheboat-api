@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.sailingwebtools.marina.model.dto.ChangeOwnerRequestStatus.SUBMITTED;
@@ -43,6 +44,16 @@ public class CrewService {
 
     @Autowired
     private ChangeOwnerRequestRepository changeOwnerRequestRepository;
+
+    public void populateUUID() {
+        Set<Crew> uuidIsNull = crewRepository.findByUuidIsNull();
+        Progress p = Progress.builder().total(uuidIsNull.size()).build();
+        uuidIsNull.stream().forEach(c -> {
+            c.setUuid(UUID.randomUUID());
+            crewRepository.save(c);
+            p.increment();
+        });
+    }
 
     public SignonDto signOn(CrewOnboardRequest crewOnboardRequest) {
 
@@ -96,7 +107,11 @@ public class CrewService {
                 .username(crew.getUsername())
                 .firstName(crew.getFirstName())
                 .lastName(crew.getLastName())
+                .mobile(crew.getMobile())
+                .email(crew.getEmail())
                 .ownedBoats(crew.getOwnedBoats().stream().map(b -> ProfileBoatResponse.builder().boatName(b.getBoatName()).id(b.getId()).build()).toList())
+                .status(crew.getStatus())
+                .uuid(crew.getUuid().toString())
                 .build();
     }
 
@@ -119,6 +134,12 @@ public class CrewService {
                 .lastActioned(LocalDateTime.now())
                 .build();
         changeOwnerRequestRepository.save(request);
+    }
+
+    public void save(CrewProfileResponse crewProfileResponse) {
+        Crew crew = crewRepository.findByUsername(crewProfileResponse.getUsername()).orElseThrow();
+        BeanUtils.copyProperties(crewProfileResponse, crew, "status", "ownedBoats", "username", "id");
+        crewRepository.save(crew);
     }
 
 //    public SignUpResponse signUp(SignUpRequest signUpRequest) {

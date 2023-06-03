@@ -9,8 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.sailingwebtools.marina.model.CrewStatus.PLACEHOLDER;
 
@@ -27,25 +32,62 @@ public class AdminService {
 
     public void migrateContacts() {
         AtomicInteger counter = new AtomicInteger();
-        boatRepository.findAll().stream()
+        List<Boat> boatList = boatRepository.findAll();
+        boatList.stream().map(Boat::getContact).collect(Collectors.toSet());
+        Map<String, Integer> usernameCounts = new HashMap<>();
+        boatList.stream()
                 .filter(b -> hasContact(b))
                 .forEach(boat -> {
                     int progress = counter.incrementAndGet();
                     if (progress % 20 == 0) {
                         log.info("migrated : {}", progress);
                     }
+                    String username = boat.getContact();
+                    Integer usernameCount = usernameCounts.get(username);
+                    if (usernameCount == null) {
+                        usernameCounts.put(username, 1);
+                    } else {
+                        username = username + "-" + usernameCount;
+                        usernameCount++;
+                        usernameCounts.put(boat.getContact(), usernameCount);
+                    }
+                    Set<Boat> ownedBoats = new HashSet<>();
+                    ownedBoats.add(boat);
                     Crew placeholderOwner = Crew.builder()
-                            .username(boat.getContact())
+                            .username(username.toLowerCase().replaceAll(" ", ""))
                             .firstName(boat.getContact())
-                            .ownedBoats(Set.of(boat))
+                            .ownedBoats(ownedBoats)
                             .password(passwordEncoder.encode(boat.getBoatName()))
                             .status(PLACEHOLDER)
                             .roles("ROLE_USER")
                             .build();
                     crewRepository.save(placeholderOwner);
-//                    boat.getOwners().add(placeholderOwner);
-//                    boatRepository.save(boat);
+                    if (boat.getOwners() != null) {
+                        boat.getOwners().add(placeholderOwner);
+                    } else {
+                        Set<Crew> owners = new HashSet<>();
+                        owners.add(placeholderOwner);
+                        boat.setOwners(owners);
+                    }
                 });
+    }
+
+    public List<Boat> noOwners() {
+        List<Boat> noOwners = boatRepository.findAll().stream()
+                .filter(b -> b.getOwners().size() == 0).collect(Collectors.toList());
+        log.info("No owners? {}", noOwners.size());
+        Progress progress = Progress.builder()
+                .total(noOwners.size())
+                .increment(20)
+                .build();
+        noOwners.stream().forEach(b -> {
+            Set<Crew> crewForBoatContact = crewRepository.findByFirstName(b.getContact());
+            List<Crew> potentialOwners = crewForBoatContact.stream().filter(c -> c.getOwnedBoats().contains(b)).collect(Collectors.toList());
+            b.getOwners().addAll(potentialOwners);
+            boatRepository.saveAndFlush(b);
+            progress.increment();
+        });
+        return noOwners;
     }
 
     private static boolean hasContact(Boat b) {
