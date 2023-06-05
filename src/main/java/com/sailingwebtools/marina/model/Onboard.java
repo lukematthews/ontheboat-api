@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -27,7 +27,5 @@ public class Onboard {
     @ManyToOne
     private Crew crew;
     @Column
-    private LocalDateTime timeOn;
-    @Column
-    private Long duration;
+    private LocalDate timeOn;
 }

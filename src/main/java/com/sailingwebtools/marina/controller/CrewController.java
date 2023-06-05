@@ -1,9 +1,9 @@
 package com.sailingwebtools.marina.controller;
 
-import com.sailingwebtools.marina.model.Crew;
 import com.sailingwebtools.marina.model.dto.ChangeOwnerRequestDto;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
 import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
+import com.sailingwebtools.marina.model.dto.OnboardResponse;
 import com.sailingwebtools.marina.model.dto.SignonDto;
 import com.sailingwebtools.marina.service.CrewService;
 import com.sailingwebtools.marina.service.OwnerShipChangeException;
@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RequestMapping("/crew")
 @RestController
 @CrossOrigin
@@ -38,7 +41,7 @@ public class CrewController {
         log.info(crewUUID);
         SignonDto onboardCrew = crewService.signOn(crew);
         HttpHeaders headers = new HttpHeaders();
-        if (crew.isRememberMe() && cookiesEnabled.equals("true")) {
+        if (cookiesEnabled.equals("true")) {
             headers.add("Set-Cookie", String.format("crewUUID=%s; Max-Age=604800; Path=/;", onboardCrew.getOnboard().getCrew().getUuid()));
             headers.add("Set-Cookie", String.format("lastBoatOnboard=%s; Max-Age=604800; Path=/;", onboardCrew.getOnboard().getBoat().getId()));
         }
@@ -46,8 +49,8 @@ public class CrewController {
     }
 
     @GetMapping("/find-by-id")
-    public ResponseEntity<Crew> getCrewForUUID(@RequestParam String uuid) {
-        Crew crew = crewService.findCrewByUUID(uuid);
+    public ResponseEntity<CrewProfileResponse> getCrewForUUID(@RequestParam String uuid) {
+        CrewProfileResponse crew = crewService.findCrewByUUID(uuid);
         if (crew == null) {
             return ResponseEntity.notFound().build();
         }
@@ -55,7 +58,6 @@ public class CrewController {
     }
 
     @GetMapping("/profile")
-//    @PreAuthorize("hasRole('ROLE_CREW')")
     public ResponseEntity<CrewProfileResponse> getProfileForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CrewProfileResponse profileResponse = crewService.getProfile(authentication.getName());
@@ -77,5 +79,11 @@ public class CrewController {
     public ResponseEntity updateUser(@RequestBody CrewProfileResponse crewProfileResponse) {
         crewService.save(crewProfileResponse);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/onboard")
+    ResponseEntity onboardRequest(@RequestParam Long boatId, @RequestParam LocalDate day) {
+        List<OnboardResponse> onboardResponseList = crewService.onboardListing(boatId, day);
+        return ResponseEntity.ok(onboardResponseList);
     }
 }

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class CrewOnboardRequest {
@@ -14,5 +16,7 @@ public class CrewOnboardRequest {
     private String lastName;
     private String mobile;
     private String email;
+
+    private LocalDate duration;
     private boolean rememberMe;
 }

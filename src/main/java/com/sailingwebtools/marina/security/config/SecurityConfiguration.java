@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/register").permitAll()
                         .requestMatchers("/auth/token").permitAll()
                         .requestMatchers("/crew/sign-on").permitAll()
+                        .requestMatchers("/crew/find-by-id").permitAll()
                         .requestMatchers("/marina/**").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin().and()

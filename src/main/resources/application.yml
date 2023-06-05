@@ -32,11 +32,11 @@ spring:
       dispatcher-types:
         - request
         - error
-logging:
-  level:
-    org:
-      springframework:
-        security: TRACE
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: TRACE
 
 application:
   security:

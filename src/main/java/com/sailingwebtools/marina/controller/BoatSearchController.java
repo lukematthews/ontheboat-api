@@ -82,4 +82,10 @@ public class BoatSearchController {
         log.info("/api/boat-details?boatId={}", boatId);
         return ResponseEntity.ok(boatService.getBoatDetails(boatId));
     }
+
+    @GetMapping("/onboard")
+    public ResponseEntity getCrewOnboard(@RequestParam Long boatId) {
+        return ResponseEntity.ok().build();
+    }
+
 }

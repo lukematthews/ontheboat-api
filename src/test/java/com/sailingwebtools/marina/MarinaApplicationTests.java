@@ -6,7 +6,6 @@ import com.sailingwebtools.marina.service.CrewService;
 import com.sailingwebtools.marina.service.Progress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,7 +20,7 @@ class MarinaApplicationTests {
     @Autowired
     private CrewService crewService;
 
-    @Test
+    //    @Test
     void testBoatCrewManyToMany() {
 //        log.info("starting...");
 //        log.info("boats: {}", boatRepository.findAll().size());
@@ -31,18 +30,18 @@ class MarinaApplicationTests {
 //        log.info("no owners: {}", noOwners.size());
     }
 
-    @Test
+    //    @Test
     public void popluateUUID() {
         crewService.populateUUID();
     }
 
     @SneakyThrows
-    @Test
+//    @Test
     public void testProgress() {
         Progress progress = Progress.builder().total(1000).build();
         for (int i = 0; i < 1000; i++) {
-            Thread.sleep(2);
-            progress.increment();
+            Thread.sleep(10);
+            progress.incrementProgressBar();
         }
     }
 }

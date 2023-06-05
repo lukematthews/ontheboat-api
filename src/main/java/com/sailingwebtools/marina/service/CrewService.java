@@ -7,6 +7,7 @@ import com.sailingwebtools.marina.model.Onboard;
 import com.sailingwebtools.marina.model.dto.ChangeOwnerRequestDto;
 import com.sailingwebtools.marina.model.dto.CrewOnboardRequest;
 import com.sailingwebtools.marina.model.dto.CrewProfileResponse;
+import com.sailingwebtools.marina.model.dto.OnboardResponse;
 import com.sailingwebtools.marina.model.dto.ProfileBoatResponse;
 import com.sailingwebtools.marina.model.dto.SignUpRequest;
 import com.sailingwebtools.marina.model.dto.SignonDto;
@@ -21,11 +22,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.sailingwebtools.marina.model.dto.ChangeOwnerRequestStatus.SUBMITTED;
 
@@ -55,20 +58,26 @@ public class CrewService {
         });
     }
 
+    public List<OnboardResponse> onboardListing(Long boatId, LocalDate day) {
+        Boat boat = boatRepository.findById(boatId).orElseThrow();
+        List<Onboard> onboard = onboardRepository.findAll(Example.of(Onboard.builder().timeOn(day).boat(boat).build()));
+        return onboard.stream()
+                .map(o -> OnboardResponse.builder().boatId(boatId).day(day).build())
+                .collect(Collectors.toList());
+    }
+
     public SignonDto signOn(CrewOnboardRequest crewOnboardRequest) {
 
         Crew crew = null;
         boolean newCrew = false;
-        if (!crewOnboardRequest.getUuid().equals("none")) {
+        if (!Objects.isNull(crewOnboardRequest.getUuid()) && !crewOnboardRequest.getUuid().equals("none")) {
             crew = crewRepository.findByUuid(UUID.fromString(crewOnboardRequest.getUuid()));
         }
         if (Objects.isNull(crew)) {
             newCrew = true;
             crew = Crew.builder().build();
-//            if (crewOnboardRequest.isRememberMe()) {
             crew.setUuid(UUID.randomUUID());
             crew.setRoles("ROLE_USER");
-//            }
             BeanUtils.copyProperties(crewOnboardRequest, crew);
             crew = crewRepository.save(crew);
         }
@@ -76,13 +85,15 @@ public class CrewService {
         Onboard onboard = Onboard.builder()
                 .boat(boat)
                 .crew(crew)
+                .timeOn(crewOnboardRequest.getDuration())
                 .build();
         onboard = onboardRepository.save(onboard);
         return SignonDto.builder().onboard(onboard).newCrew(newCrew).build();
     }
 
-    public Crew findCrewByUUID(String uuid) {
-        return crewRepository.findByUuid(UUID.fromString(uuid));
+    public CrewProfileResponse findCrewByUUID(String uuid) {
+        Crew crew = crewRepository.findByUuid(UUID.fromString(uuid));
+        return getProfile(crew.getUsername());
     }
 
     public Crew findCrewById(Long id) {
