@@ -59,10 +59,14 @@ public class CrewService {
     }
 
     public List<OnboardResponse> onboardListing(Long boatId, LocalDate day) {
-        Boat boat = boatRepository.findById(boatId).orElseThrow();
-        List<Onboard> onboard = onboardRepository.findAll(Example.of(Onboard.builder().timeOn(day).boat(boat).build()));
+        List<Onboard> onboard = onboardRepository.findAllByBoatAndTimeOn(boatId, day);
         return onboard.stream()
-                .map(o -> OnboardResponse.builder().boatId(boatId).day(day).build())
+                .map(o -> OnboardResponse.builder()
+                        .uuid(o.getCrew().getUuid())
+                        .name(o.getCrew().getFirstName() + " " + o.getCrew().getLastName())
+                        .boatId(boatId)
+                        .day(day)
+                        .build())
                 .collect(Collectors.toList());
     }
 

@@ -82,7 +82,7 @@ public class CrewController {
     }
 
     @GetMapping("/onboard")
-    ResponseEntity onboardRequest(@RequestParam Long boatId, @RequestParam LocalDate day) {
+    public ResponseEntity<List<OnboardResponse>> onboardRequest(@RequestParam Long boatId, @RequestParam LocalDate day) {
         List<OnboardResponse> onboardResponseList = crewService.onboardListing(boatId, day);
         return ResponseEntity.ok(onboardResponseList);
     }
