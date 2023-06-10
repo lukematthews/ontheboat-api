@@ -109,10 +109,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                                auth.requestMatchers("/auth/**").permitAll()
-//                                .requestMatchers("/api/test/**").permitAll()
-                                        .requestMatchers("/marina/**").permitAll()
-                                        .anyRequest().authenticated()
+                        auth.requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/api/h2-console").permitAll()
+                                .requestMatchers("/marina/**").permitAll()
+                                .anyRequest().authenticated()
                 );
 
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
