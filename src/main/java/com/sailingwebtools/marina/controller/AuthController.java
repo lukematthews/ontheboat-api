@@ -1,12 +1,19 @@
 package com.sailingwebtools.marina.controller;
 
 import com.sailingwebtools.marina.model.Crew;
+import com.sailingwebtools.marina.model.dto.LoginRequest;
 import com.sailingwebtools.marina.model.dto.SignUpRequest;
+import com.sailingwebtools.marina.model.dto.UserInfoResponse;
+import com.sailingwebtools.marina.security.JwtUtils;
 import com.sailingwebtools.marina.service.CrewService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,6 +38,10 @@ public class AuthController {
     private CrewService crewService;
     @Autowired
     private JwtEncoder encoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @PostMapping(value = "/register", consumes = "application/json")
     public ResponseEntity<Map<String, Object>> register(@RequestBody SignUpRequest signUpRequest, HttpServletResponse response) {
@@ -41,27 +53,30 @@ public class AuthController {
                 "message", "User registered successfully!"));
     }
 
-    @PostMapping("/token")
-    public String token(Authentication authentication, HttpServletResponse response) {
-        Instant now = Instant.now();
-        long expiry = 36000L;
-        String scope = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("self")
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiry))
-                .subject(authentication.getName())
-                .claim("scope", scope)
-                .build();
-        String token = this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        Cookie jwtCookie = new Cookie("otb", token);
-        jwtCookie.setSecure(true);
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(36000);
-        response.addCookie(jwtCookie);
-        return token;
+
+    @PostMapping(value = "/signin", consumes = "application/json")
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Crew userDetails = (Crew) authentication.getPrincipal();
+
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(UserInfoResponse.builder()
+                        .token(jwtUtils.generateTokenFromUsername(userDetails.getUsername()))
+                        .username(userDetails.getUsername())
+                        .id(userDetails.getId())
+                        .email(userDetails.getEmail())
+                        .roles(roles).build());
     }
 
     private String tokenValue(Authentication authentication) {

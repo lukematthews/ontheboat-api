@@ -6,7 +6,7 @@ marina:
   photos:
     path: "/data/photos-combined/"
   security:
-    jwtCookieName: boatweb
+    jwtCookieName: otb
     jwtSecret: yAwfZ2TvTolMoaeF0LY4OyMtihSvpUWHwmnOTAWzLXM7rwCQpE7Ca1+VT6n4BSZG9XFkH1EeMVFItLy2Cw9jXJK0pPxgXW+vcFSn2zbhqyS2dyf2Ro2btDBiczevBWSp
     jwtExpirationMs: 86400000
 server:
@@ -32,11 +32,11 @@ spring:
       dispatcher-types:
         - request
         - error
-#logging:
-#  level:
-#    org:
-#      springframework:
-#        security: TRACE
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
 
 application:
   security:
