@@ -29,6 +29,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+
 @Configuration
 //@EnableWebSecurity
 @EnableMethodSecurity
@@ -107,11 +109,12 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .cors().disable()
-                .csrf().ignoringRequestMatchers("/h2-console/**").and()
+                .csrf().ignoringRequestMatchers(toH2Console()).and()
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**").permitAll()
+                                .requestMatchers(toH2Console()).permitAll()
                                 .requestMatchers("/api/h2-console/**").permitAll()
                                 .requestMatchers("/marina/**").permitAll()
                                 .anyRequest().authenticated()
