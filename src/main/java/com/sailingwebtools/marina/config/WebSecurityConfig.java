@@ -11,6 +11,7 @@ import com.sailingwebtools.marina.security.AuthTokenFilter;
 import com.sailingwebtools.marina.service.CrewUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,8 +29,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 //@EnableWebSecurity
@@ -109,13 +108,12 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .cors().disable()
-                .csrf().ignoringRequestMatchers(toH2Console()).and()
+                .csrf().ignoringRequestMatchers(PathRequest.toH2Console()).and()
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**").permitAll()
-                                .requestMatchers(toH2Console()).permitAll()
-                                .requestMatchers("/api/h2-console/**").permitAll()
+                                .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 .requestMatchers("/marina/**").permitAll()
                                 .anyRequest().authenticated()
                 );
