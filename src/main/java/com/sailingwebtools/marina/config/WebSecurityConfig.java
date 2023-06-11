@@ -110,7 +110,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/api/h2-console").permitAll()
+                                .requestMatchers("/api/h2-console/**").permitAll()
                                 .requestMatchers("/marina/**").permitAll()
                                 .anyRequest().authenticated()
                 );
