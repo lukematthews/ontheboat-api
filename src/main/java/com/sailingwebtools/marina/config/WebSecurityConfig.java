@@ -36,18 +36,12 @@ import java.security.interfaces.RSAPublicKey;
 //jsr250Enabled = true,
 //prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
-
-    //    @Value("${spring.h2.console.path}")
-//    private String h2ConsolePath;
     @Value("${jwt.public.key}")
     private RSAPublicKey key;
-
     @Value("${jwt.private.key}")
     private RSAPrivateKey priv;
-
     @Autowired
     private CrewUserDetailsService userDetailsService;
-
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
@@ -56,26 +50,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         return new AuthTokenFilter();
     }
 
-//  @Override
-//  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-//    authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-//  }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-
         return authProvider;
     }
-
-//  @Bean
-//  @Override
-//  public AuthenticationManager authenticationManagerBean() throws Exception {
-//    return super.authenticationManagerBean();
-//  }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -118,13 +100,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 );
 
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
-//        http.headers(headers -> headers.frameOptions(frameOption -> frameOption.sameOrigin()));
-        http.headers().frameOptions().disable();
-
+        http.headers(headers -> headers.frameOptions(frameOption -> frameOption.sameOrigin()));
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
