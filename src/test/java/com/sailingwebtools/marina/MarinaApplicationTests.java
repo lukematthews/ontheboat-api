@@ -2,8 +2,10 @@ package com.sailingwebtools.marina;
 
 import com.sailingwebtools.marina.repository.BoatRepository;
 import com.sailingwebtools.marina.repository.CrewRepository;
+import com.sailingwebtools.marina.service.AdminService;
 import com.sailingwebtools.marina.service.CrewService;
 import com.sailingwebtools.marina.service.Progress;
+import com.sailingwebtools.marina.service.TopYachtLoader;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @Slf4j
 class MarinaApplicationTests {
+
+    @Autowired
+    private TopYachtLoader topYachtLoader;
+    @Autowired
+    private AdminService adminService;
 
     @Autowired
     private BoatRepository boatRepository;
@@ -28,6 +35,13 @@ class MarinaApplicationTests {
 //        List<Boat> noOwners = boatRepository.findAll().stream().filter(b -> b.getOwners().size() == 0).collect(Collectors.toList());
 //        noOwners.stream().forEach(b -> log.info("{}", b));
 //        log.info("no owners: {}", noOwners.size());
+    }
+
+    //    @Test
+    public void testInitialisation() {
+//        topYachtLoader.loadFromTopYacht();
+//        topYachtLoader.updateArchivedStateFromTopYacht();
+//        adminService.migrateContacts();
     }
 
     //    @Test

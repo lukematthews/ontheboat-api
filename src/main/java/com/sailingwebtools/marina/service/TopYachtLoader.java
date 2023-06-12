@@ -58,7 +58,7 @@ public class TopYachtLoader {
 
     private static void accept(Long consumer) {
     }
-    
+
 
     @SneakyThrows
     public List<Boat> loadFromTopYacht() {
@@ -86,6 +86,7 @@ public class TopYachtLoader {
                 .map(element -> processor.apply(element))
                 .collect(Collectors.toList());
         boatRepository.saveAll(boatList);
+        log.info("finished loading {} boats", boatList.size());
         return boatList;
     }
 
@@ -99,7 +100,7 @@ public class TopYachtLoader {
         }
         boolean archived = element.child(4).text().equals("Y") ? true : false;
         boatToUpdate.setArchived(archived);
-        boatRepository.saveAndFlush(boatToUpdate);
+        boatToUpdate = boatRepository.save(boatToUpdate);
         if (currentItem % 10 == 0) {
             log.info("" + currentItem);
         }
@@ -118,7 +119,6 @@ public class TopYachtLoader {
                 .design(element.child(3).text())
                 .archived(archived)
                 .build();
-        boatRepository.save(boat);
         loadBoatDetailsForBoat(boat);
         if (currentItem % 20 == 0) {
             log.info("" + currentItem);
@@ -156,7 +156,6 @@ public class TopYachtLoader {
     private void loadBoatDetailsForBoat(Boat boat) {
         Document doc = Jsoup.connect(boatDetailUrl + boat.getId()).get();
         BoatDetails boatDetails = BoatDetails.builder()
-                .boat(boat)
                 .boatName(boat.getBoatName())
                 .launchYear(textFrom(doc, "#14"))
                 .design(textFrom(doc, "#16"))
@@ -166,7 +165,6 @@ public class TopYachtLoader {
                 .hullColour(textFrom(doc, "#26"))
                 .bio(textFromDocumentWithNewlines(doc, "#39"))
                 .build();
-
         boatDetailsRepository.save(boatDetails);
 
         boat.setHandicaps(loadHandicaps(boat, doc));
@@ -196,7 +194,6 @@ public class TopYachtLoader {
                     rating = StringUtils.isNotBlank(rating) ? rating : null;
                     return Handicap.builder()
                             .handicapType(handicapType.orElse(null))
-                            .boat(boat)
                             .rating(rating)
                             .certificate(certificate)
                             .expiryDate(expiryDate)

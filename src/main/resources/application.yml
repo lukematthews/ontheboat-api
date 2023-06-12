@@ -14,12 +14,11 @@ server:
     context-path: "/api"
 spring:
   datasource:
-    url: jdbc:h2:file:./data/backend.db;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: sa
+    url: jdbc:postgresql://postgres:5432/ontheboat
+    username: ontheboat
+    password: ontheboat
   hibernate:
-    dialect: org.hibernate.dialect.H2Dialect
+    dialect: org.hibernate.dialect.PostgreSQLDialect
   jpa:
     #    properties.hibernate:
     #      show_sql: true

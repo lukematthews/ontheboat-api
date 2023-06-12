@@ -49,7 +49,6 @@ public class Boat {
     @OneToMany(cascade = CascadeType.REMOVE, fetch = EAGER)
     @JoinColumn(name = "boat_id")
     private List<ChangeOwnerRequest> changeOwnerRequests;
-    //    @ManyToMany(mappedBy = "ownedBoats", fetch = FetchType.EAGER)
     @ManyToMany(fetch = EAGER)
     @JoinTable(
             name = "boat_owners",
