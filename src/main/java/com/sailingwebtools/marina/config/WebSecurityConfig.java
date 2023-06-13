@@ -83,7 +83,8 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated();
 
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
-        http.headers(headers -> headers.frameOptions(frameOption -> frameOption.sameOrigin()));
+        http.headers(headers -> headers.frameOptions(frameOption -> frameOption.disable()));
+//        http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
