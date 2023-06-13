@@ -40,6 +40,7 @@ public class Crew implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column
+    @ToString.Exclude
     private UUID uuid;
     @Column
     private String firstName;

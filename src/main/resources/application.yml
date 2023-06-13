@@ -14,18 +14,11 @@ server:
     context-path: "/api"
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/ontheboat
+    url: jdbc:postgresql://ontheboat-postgres:5432/ontheboat
     username: ontheboat
     password: ontheboat
   hibernate:
     dialect: org.hibernate.dialect.PostgreSQLDialect
-  jpa:
-    #    properties.hibernate:
-    #      show_sql: true
-    #      use_sql_comments: true
-    #      format_sql: true
-    hibernate:
-      ddl-auto: update
   security:
     filter:
       dispatcher-types:

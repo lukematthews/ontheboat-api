@@ -8,6 +8,7 @@ import com.sailingwebtools.marina.service.Progress;
 import com.sailingwebtools.marina.service.TopYachtLoader;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -27,7 +28,7 @@ class MarinaApplicationTests {
     @Autowired
     private CrewService crewService;
 
-    //    @Test
+    @Test
     void testBoatCrewManyToMany() {
 //        log.info("starting...");
 //        log.info("boats: {}", boatRepository.findAll().size());
@@ -37,7 +38,7 @@ class MarinaApplicationTests {
 //        log.info("no owners: {}", noOwners.size());
     }
 
-    //    @Test
+    @Test
     public void testInitialisation() {
 //        topYachtLoader.loadFromTopYacht();
 //        topYachtLoader.updateArchivedStateFromTopYacht();

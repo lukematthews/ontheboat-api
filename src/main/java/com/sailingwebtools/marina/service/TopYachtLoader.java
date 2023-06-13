@@ -85,7 +85,6 @@ public class TopYachtLoader {
                 .parallel()
                 .map(element -> processor.apply(element))
                 .collect(Collectors.toList());
-        boatRepository.saveAll(boatList);
         log.info("finished loading {} boats", boatList.size());
         return boatList;
     }

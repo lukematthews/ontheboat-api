@@ -126,7 +126,6 @@ public class CrewService {
                 .email(crew.getEmail())
                 .ownedBoats(crew.getOwnedBoats().stream().map(b -> ProfileBoatResponse.builder().boatName(b.getBoatName()).id(b.getId()).build()).toList())
                 .status(crew.getStatus())
-                .uuid(crew.getUuid().toString())
                 .build();
     }
 
