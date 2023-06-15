@@ -14,16 +14,16 @@ server:
     context-path: "/api"
 spring:
   datasource:
-    url: jdbc:postgresql://ontheboat-postgres:5432/ontheboat
+    url: jdbc:postgresql://192.168.20.16:5432/ontheboat
     username: ontheboat
     password: ontheboat
   hibernate:
     dialect: org.hibernate.dialect.PostgreSQLDialect
-  security:
-    filter:
-      dispatcher-types:
-        - request
-        - error
+#  security:
+#    filter:
+#      dispatcher-types:
+#        - request
+#        - error
 logging:
   level:
     org:

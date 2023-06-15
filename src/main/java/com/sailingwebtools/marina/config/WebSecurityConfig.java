@@ -16,15 +16,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -32,7 +29,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 @Configuration
-@EnableMethodSecurity
+//@EnableMethodSecurity
 public class WebSecurityConfig {
     @Value("${jwt.public.key}")
     private RSAPublicKey key;
@@ -68,26 +65,28 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .cors().disable()
-                .csrf().ignoringRequestMatchers("/h2-console/**", "/auth/signin", "/actuator/health").and()
-//                .csrf().disable()
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .anonymous().and()
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
-                                        "/actuator/health",
-                                        "/auth/**",
-                                        "/h2-console/**",
-                                        "/marina/**").permitAll()
-                                .anyRequest().authenticated());
+        http.cors().disable().csrf().disable().anonymous().and().authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll());
 
-        // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
-        http.headers(headers -> headers.frameOptions(frameOption -> frameOption.disable()));
-//        http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+//        http
+//                .cors().disable()
+//                .csrf().ignoringRequestMatchers("/h2-console/**", "/auth/signin", "/actuator/health").and()
+////                .csrf().disable()
+//                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .anonymous().and()
+//                .authorizeHttpRequests(auth ->
+//                        auth.requestMatchers(
+//                                        "/actuator/health",
+//                                        "/auth/**",
+//                                        "/h2-console/**",
+//                                        "/marina/**").permitAll()
+//                                .anyRequest().authenticated());
+//
+//        // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
+//        http.headers(headers -> headers.frameOptions(frameOption -> frameOption.disable()));
+////        http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+//        http.authenticationProvider(authenticationProvider());
+//        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -98,7 +97,7 @@ public class WebSecurityConfig {
         return new NimbusJwtEncoder(jwks);
     }
 
-    @Bean
+    //    @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
