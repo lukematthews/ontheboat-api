@@ -76,7 +76,7 @@ public class WebSecurityConfig {
         http
                 .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(requests ->
-                        requests.requestMatchers("/actuator/health", "/marina/**", "/auth/**").permitAll()
+                        requests.requestMatchers("/actuator/**", "/marina/**", "/auth/**").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authenticationProvider(authenticationProvider());
