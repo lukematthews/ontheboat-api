@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.sailingwebtools.marina.security.AuthEntryPointJwt;
 import com.sailingwebtools.marina.security.AuthTokenFilter;
+import com.sailingwebtools.marina.security.JwtUtils;
 import com.sailingwebtools.marina.service.CrewUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,20 +17,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 @Configuration
-//@EnableMethodSecurity
+@EnableMethodSecurity
 public class WebSecurityConfig {
     @Value("${jwt.public.key}")
     private RSAPublicKey key;
@@ -39,10 +43,12 @@ public class WebSecurityConfig {
     private CrewUserDetailsService userDetailsService;
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+    @Autowired
+    private JwtUtils jwtUtils;
 
-    @Bean
+
     public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
+        return new AuthTokenFilter(jwtUtils, userDetailsService);
     }
 
     @Bean
@@ -65,9 +71,17 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors().disable().csrf().disable().anonymous().and().authorizeHttpRequests(auth -> auth.requestMatchers("/**").permitAll());
 
-//        http
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http
+                .csrf(CsrfConfigurer::disable)
+                .authorizeHttpRequests(requests ->
+                        requests.requestMatchers("/actuator/health", "/marina/**", "/auth/**").permitAll()
+                                .anyRequest().authenticated())
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authenticationProvider(authenticationProvider());
+
+        //        http
 //                .cors().disable()
 //                .csrf().ignoringRequestMatchers("/h2-console/**", "/auth/signin", "/actuator/health").and()
 ////                .csrf().disable()
@@ -91,6 +105,11 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/actuator/health");
+    }
+
+    @Bean
     public JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
@@ -98,12 +117,12 @@ public class WebSecurityConfig {
     }
 
     //    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/crew/**").allowedOrigins("http://localhost", "http://marina-ui");
-            }
-        };
-    }
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/crew/**").allowedOrigins("http://localhost", "http://marina-ui");
+//            }
+//        };
+//    }
 }

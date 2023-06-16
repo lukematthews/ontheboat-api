@@ -79,7 +79,7 @@ public class TopYachtLoader {
         String title = doc.title();
         log.info(title);
         Elements boatTable = doc.select("#boats > tbody > tr");
-
+        log.info("Processing {} boats", boatTable.size());
         List<Boat> boatList = boatTable.stream()
                 .filter(element -> element.childrenSize() > 4)
                 .parallel()
@@ -118,6 +118,7 @@ public class TopYachtLoader {
                 .design(element.child(3).text())
                 .archived(archived)
                 .build();
+        boat = boatRepository.save(boat);
         loadBoatDetailsForBoat(boat);
         if (currentItem % 20 == 0) {
             log.info("" + currentItem);
