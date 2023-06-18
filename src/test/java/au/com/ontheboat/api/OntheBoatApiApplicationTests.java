@@ -42,7 +42,7 @@ class OntheBoatApiApplicationTests {
     public void testInitialisation() {
 //        topYachtLoader.loadFromTopYacht();
 //        topYachtLoader.updateArchivedStateFromTopYacht();
-        adminService.migrateContacts();
+//        adminService.migrateContacts();
     }
 
     //    @Test
