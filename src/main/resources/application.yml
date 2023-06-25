@@ -10,6 +10,7 @@ au.com.ontheboat.api:
     jwtSecret: yAwfZ2TvTolMoaeF0LY4OyMtihSvpUWHwmnOTAWzLXM7rwCQpE7Ca1+VT6n4BSZG9XFkH1EeMVFItLy2Cw9jXJK0pPxgXW+vcFSn2zbhqyS2dyf2Ro2btDBiczevBWSp
     jwtExpirationMs: 86400000
 server:
+  port: 8081
   servlet:
     context-path: "/api"
 spring:
@@ -36,8 +37,6 @@ application:
       expiration: 86400000 # a day
       refresh-token:
         expiration: 604800000 # 7 days
-
-
 jwt:
   private.key: classpath:app.key
   public.key: classpath:app.pub
