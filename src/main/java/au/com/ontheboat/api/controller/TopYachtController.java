@@ -34,7 +34,7 @@ public class TopYachtController {
 
     @GetMapping("/save-image")
     public ResponseEntity fetchBoatImage(@RequestParam Long boatId) {
-        topYachtLoader.saveImage(boatId);
+//        topYachtLoader.saveImage(boatId);
         return ResponseEntity.ok().build();
     }
 
