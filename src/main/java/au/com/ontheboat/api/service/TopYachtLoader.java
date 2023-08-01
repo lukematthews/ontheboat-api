@@ -2,9 +2,11 @@ package au.com.ontheboat.api.service;
 
 import au.com.ontheboat.api.model.Boat;
 import au.com.ontheboat.api.model.BoatDetails;
+import au.com.ontheboat.api.model.BoatMedia;
 import au.com.ontheboat.api.model.Handicap;
 import au.com.ontheboat.api.model.HandicapType;
 import au.com.ontheboat.api.repository.BoatDetailsRepository;
+import au.com.ontheboat.api.repository.BoatMediaRepository;
 import au.com.ontheboat.api.repository.BoatRepository;
 import au.com.ontheboat.api.repository.HandicapRepository;
 import lombok.SneakyThrows;
@@ -24,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +55,8 @@ public class TopYachtLoader {
     private BoatDetailsRepository boatDetailsRepository;
     @Autowired
     private HandicapRepository handicapRepository;
-
+    @Autowired
+    private BoatMediaRepository boatMediaRepository;
     private AtomicInteger count = new AtomicInteger();
 
 
@@ -112,13 +116,14 @@ public class TopYachtLoader {
         boolean archived = element.child(4).text().equals("Y") ? true : false;
         Boat boat = Boat.builder()
                 .id(Long.valueOf(id))
+                .externalId(id)
                 .boatName(element.child(0).text())
                 .sailNumber(element.child(1).text())
                 .contact(element.child(2).text())
                 .design(element.child(3).text())
                 .archived(archived)
                 .build();
-        boat = boatRepository.save(boat);
+        boat = boatRepository.saveAndFlush(boat);
         loadBoatDetailsForBoat(boat);
         if (currentItem % 20 == 0) {
             log.info("" + currentItem);
@@ -154,7 +159,7 @@ public class TopYachtLoader {
 
     @SneakyThrows
     private void loadBoatDetailsForBoat(Boat boat) {
-        Document doc = Jsoup.connect(boatDetailUrl + boat.getId()).get();
+        Document doc = Jsoup.connect(boatDetailUrl + boat.getExternalId()).get();
         BoatDetails boatDetails = BoatDetails.builder()
                 .boatName(boat.getBoatName())
                 .launchYear(textFrom(doc, "#14"))
@@ -207,7 +212,7 @@ public class TopYachtLoader {
         AtomicInteger count = new AtomicInteger();
         boatRepository.findAll().stream().parallel().forEach(boat -> {
             int currentCount = count.incrementAndGet();
-            saveImage(boat.getId());
+            saveImage(boat);
             if (currentCount % 20 == 0) {
                 log.info("" + currentCount);
             }
@@ -215,16 +220,17 @@ public class TopYachtLoader {
     }
 
     @SneakyThrows
-    public Boat saveImage(Long boatId) {
-        URL imageUrl = new URL(boatPhotoUrl + boatId);
+    public Boat saveImage(Boat boat) {
+        URL imageUrl = new URL(boatPhotoUrl + boat.getExternalId());
         BufferedImage image = ImageIO.read(imageUrl);
-        File output = new File("./data/photos-png/" + boatId + ".png");
+        File output = new File("./data/photos-png/" + boat.getExternalId() + ".png");
         FileOutputStream fos = new FileOutputStream(output);
         ImageIO.write(image, "png", fos);
         fos.flush();
         fos.close();
-        return boatRepository.findById(boatId).orElse(null);
-
+        BoatMedia boatMedia = BoatMedia.builder().boat(boat).fileId(boat.getExternalId() + ".png").uploadDate(LocalDateTime.now()).build();
+        boatMediaRepository.save(boatMedia);
+        return boat;
     }
 
     private String textFrom(Document doc, String selector) {

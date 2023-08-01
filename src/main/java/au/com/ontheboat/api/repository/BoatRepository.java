@@ -23,4 +23,7 @@ public interface BoatRepository extends JpaRepository<Boat, Long> {
             "LOWER(b.design) LIKE " + LIKE_CLAUSE)
     Page<Boat> findBySearchTerm(@Param("searchTerm") String searchTerm,
             Pageable pageRequest);
+
+    @Query
+    Boat findByExternalId(String externalId);
 }

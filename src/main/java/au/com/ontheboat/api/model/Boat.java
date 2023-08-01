@@ -33,6 +33,8 @@ public class Boat {
     @GeneratedValue
     private Long id;
     @Column
+    private String externalId;
+    @Column
     private String boatName;
     @Column
     private String sailNumber;
@@ -55,4 +57,7 @@ public class Boat {
             joinColumns = @JoinColumn(name = "boat_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "crew_id", referencedColumnName = "id"))
     private Set<Crew> owners;
+
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = EAGER, mappedBy = "boat")
+    private Set<BoatMedia> boatMedia;
 }

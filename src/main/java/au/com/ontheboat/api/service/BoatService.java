@@ -63,7 +63,7 @@ public class BoatService {
     }
 
     public Boat getBoatDetails(Long boatId) {
-        return boatRepository.findById(boatId).orElse(null);
+        return boatRepository.findByExternalId(boatId.toString());
     }
 
 }

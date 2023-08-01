@@ -1,6 +1,7 @@
 package au.com.ontheboat.api.model.dto;
 
 import au.com.ontheboat.api.model.BoatDetails;
+import au.com.ontheboat.api.model.BoatMedia;
 import au.com.ontheboat.api.model.Handicap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class BoatDto {
     private BoatDetails boatDetails;
     private List<Handicap> handicaps;
     private Set<CrewProfileResponse> owners;
+    private Set<BoatMedia> boatMedia;
 }
