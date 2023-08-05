@@ -20,16 +20,16 @@ spring:
     password: ontheboat
   hibernate:
     dialect: org.hibernate.dialect.PostgreSQLDialect
-#  security:
-#    filter:
-#      dispatcher-types:
-#        - request
-#        - error
-logging:
-  level:
-    org:
-      springframework:
-        security: TRACE
+  logging:
+    level:
+      org:
+        springframework:
+          security: TRACE
+#  jpa:
+#    generate-ddl: true
+#    hibernate:
+#      ddl-auto: create
+
 application:
   security:
     jwt:
@@ -40,3 +40,14 @@ application:
 jwt:
   private.key: classpath:app.key
   public.key: classpath:app.pub
+jakarta:
+  persistence:
+    schema-generation:
+      scripts:
+        action: create
+        create-source: metadata
+javax:
+  persistence:
+    schema-generation:
+      scripts:
+        create-target: create.sql

@@ -1,6 +1,7 @@
 package au.com.ontheboat.api.controller;
 
 import au.com.ontheboat.api.model.Boat;
+import au.com.ontheboat.api.model.BoatMedia;
 import au.com.ontheboat.api.model.dto.BoatDto;
 import au.com.ontheboat.api.service.BoatService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,8 @@ public class BoatSearchController {
     @CrossOrigin(origins = "http://marina-ui")
     public ResponseEntity<byte[]> getImageWithMediaType(@RequestParam Long id) throws IOException {
         try {
-            File photoFile = new File(photoDataPath + id + ".png");
+            BoatMedia media = boatService.getMedia(id);
+            File photoFile = new File(photoDataPath + media.getFileId());
             log.info("/api/boat-photo {}", photoFile.getAbsolutePath());
             InputStream in = new FileInputStream(photoFile);
             if (in == null) {

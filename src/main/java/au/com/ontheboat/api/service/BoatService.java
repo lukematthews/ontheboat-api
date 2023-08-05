@@ -1,9 +1,11 @@
 package au.com.ontheboat.api.service;
 
 import au.com.ontheboat.api.model.Boat;
+import au.com.ontheboat.api.model.BoatMedia;
 import au.com.ontheboat.api.model.Crew;
 import au.com.ontheboat.api.model.dto.BoatDto;
 import au.com.ontheboat.api.model.dto.CrewProfileResponse;
+import au.com.ontheboat.api.repository.BoatMediaRepository;
 import au.com.ontheboat.api.repository.BoatRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 public class BoatService {
     @Autowired
     private BoatRepository boatRepository;
+    @Autowired
+    private BoatMediaRepository boatMediaRepository;
 
     public Page<Boat> getAllBoats(Pageable page) {
         log.info(page.toString());
@@ -49,6 +53,10 @@ public class BoatService {
             return boatDto;
         });
         return boatDtoPage;
+    }
+
+    public BoatMedia getMedia(Long id) {
+        return boatMediaRepository.getReferenceById(id);
     }
 
     private String renderName(Crew crew) {

@@ -48,6 +48,13 @@ class OntheBoatApiApplicationTests {
         crewService.populateUUID();
     }
 
+//    @Test
+//    public void loadAllTheThings() {
+//        topYachtLoader.loadFromTopYacht();
+//        topYachtLoader.saveAllImages();
+//        adminService.migrateContacts();
+//    }
+
     @SneakyThrows
 //    @Test
     public void testProgress() {

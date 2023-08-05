@@ -17,6 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class BoatDto {
     private Long id;
+    private String externalId;
     private String boatName;
     private String sailNumber;
     private String contact;
