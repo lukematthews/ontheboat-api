@@ -26,7 +26,7 @@ public class AdminService {
     @Autowired
     private CrewRepository crewRepository;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder encoder;
 
 
     public void migrateContacts() {
@@ -56,7 +56,7 @@ public class AdminService {
                             .username(username.toLowerCase().replaceAll(" ", ""))
                             .firstName(boat.getContact())
                             .ownedBoats(ownedBoats)
-                            .password(passwordEncoder.encode(boat.getBoatName()))
+                            .password(encoder.encode(boat.getBoatName()))
                             .status(CrewStatus.PLACEHOLDER)
                             .roles("ROLE_USER")
                             .build();
