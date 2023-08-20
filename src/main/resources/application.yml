@@ -4,11 +4,7 @@ au.com.ontheboat.api:
     boat-detail: "http://www.topyacht.com.au/mt/mt_pub.php?boid="
     boat-photo: "http://www.topyacht.com.au/mt/mt_photo.php?boid="
   photos:
-    path: "/data/photos-combined/"
-  security:
-    jwtCookieName: otb
-    jwtSecret: yAwfZ2TvTolMoaeF0LY4OyMtihSvpUWHwmnOTAWzLXM7rwCQpE7Ca1+VT6n4BSZG9XFkH1EeMVFItLy2Cw9jXJK0pPxgXW+vcFSn2zbhqyS2dyf2Ro2btDBiczevBWSp
-    jwtExpirationMs: 86400000
+    path: "/Users/matth/Documents/projects/marina-api/data/photos-png/"
 server:
   port: 8081
   servlet:
@@ -20,15 +16,17 @@ spring:
     password: ontheboat
   hibernate:
     dialect: org.hibernate.dialect.PostgreSQLDialect
-  logging:
-    level:
+logging:
+  level:
     org:
       springframework:
         security: TRACE
 okta.oauth2:
   issuer: https://ontheboat.au.auth0.com/
   client-id: jHQGXEx9RnQ7jmPbi6a8dWY4VkwU7VBP
-  clientSecret:
+  clientSecret: BRItcKT2cDbPvMxopK4bb1en4MsRDFcVoU68YKYtBJCvonjqFfI7cCsBXrW074PT
+  audience: http://marina-api:8081
+
 #  jpa:
 #    generate-ddl: true
 #    hibernate:
@@ -55,3 +53,22 @@ javax:
     schema-generation:
       scripts:
         create-target: create.sql
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://ontheboat-postgres:5432/ontheboat
+  username: ontheboat
+  password: ontheboat
+au.com.ontheboat.api:
+  photos.path: "/data/photos-combined/"
+
+logging.level:
+  org.springframework.security: INFO
+okta.oauth2:
+  issuer: https://ontheboat.au.auth0.com/
+  client-id: jHQGXEx9RnQ7jmPbi6a8dWY4VkwU7VBP
+  clientSecret: BRItcKT2cDbPvMxopK4bb1en4MsRDFcVoU68YKYtBJCvonjqFfI7cCsBXrW074PT
+  audience: http://marina-api:8081

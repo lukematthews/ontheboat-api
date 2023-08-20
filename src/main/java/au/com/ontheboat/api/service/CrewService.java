@@ -116,7 +116,7 @@ public class CrewService {
     }
 
     public CrewProfileResponse getProfile(String username) {
-        Crew crew = crewRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(""));
+        Crew crew = crewRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username + "is not registered"));
         return CrewProfileResponse.builder()
                 .id(crew.getId())
                 .username(crew.getUsername())
@@ -155,14 +155,4 @@ public class CrewService {
         BeanUtils.copyProperties(crewProfileResponse, crew, "status", "ownedBoats", "username", "id");
         crewRepository.save(crew);
     }
-
-//    public SignUpResponse signUp(SignUpRequest signUpRequest) {
-//        Crew crew = Crew.builder().build();
-//        BeanUtils.copyProperties(signUpRequest, crew);
-//        crew.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-//        crew.setUuid(UUID.randomUUID());
-//
-//        crew = crewRepository.save(crew);
-//        return SignUpResponse.builder().crew(crew).build();
-//    }
 }

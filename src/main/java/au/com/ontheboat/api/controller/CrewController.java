@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -59,12 +59,16 @@ public class CrewController {
     }
 
     @GetMapping("/profile")
-    @PreAuthorize("hasRole('ROLE_USER')")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<CrewProfileResponse> getProfileForUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CrewProfileResponse profileResponse = crewService.getProfile(authentication.getName());
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            CrewProfileResponse profileResponse = crewService.getProfile(authentication.getName());
 
-        return ResponseEntity.ok(profileResponse);
+            return ResponseEntity.ok(profileResponse);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping(value = "/request-ownership-change", consumes = "application/json")

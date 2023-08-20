@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .addLogoutHandler(oidcLogoutHandler()));
         // enable OAuth2/OIDC
         http.oauth2Login(withDefaults());
+        http.oauth2ResourceServer(oauth -> oauth.jwt(withDefaults()));
 
         return http.build();
     }
