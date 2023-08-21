@@ -61,13 +61,13 @@ public class CrewController {
     @GetMapping("/profile")
 //    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<CrewProfileResponse> getProfileForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             CrewProfileResponse profileResponse = crewService.getProfile(authentication.getName());
 
             return ResponseEntity.ok(profileResponse);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(crewService.getNotSignedUp(authentication));
         }
     }
 

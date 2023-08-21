@@ -1,8 +1,11 @@
 package au.com.ontheboat.api.service;
 
+import au.com.ontheboat.api.client.Auth0Client;
+import au.com.ontheboat.api.client.Userinfo;
 import au.com.ontheboat.api.model.Boat;
 import au.com.ontheboat.api.model.ChangeOwnerRequest;
 import au.com.ontheboat.api.model.Crew;
+import au.com.ontheboat.api.model.CrewStatus;
 import au.com.ontheboat.api.model.Onboard;
 import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDto;
 import au.com.ontheboat.api.model.dto.CrewOnboardRequest;
@@ -18,8 +21,10 @@ import au.com.ontheboat.api.repository.OnboardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -47,6 +52,8 @@ public class CrewService {
 
     @Autowired
     private ChangeOwnerRequestRepository changeOwnerRequestRepository;
+    @Autowired
+    private Auth0Client auth0Client;
 
     public void populateUUID() {
         Set<Crew> uuidIsNull = crewRepository.findByUuidIsNull();
@@ -129,6 +136,18 @@ public class CrewService {
                 .build();
     }
 
+    public CrewProfileResponse getNotSignedUp(Authentication authentication) {
+        String token = ((JwtAuthenticationToken) authentication).getToken().getTokenValue();
+        Userinfo userInfo = auth0Client.getUserInfo("Bearer " + token);
+        return CrewProfileResponse.builder()
+                .id(-1L)
+                .email(userInfo.getEmail())
+                .firstName("")
+                .lastName("")
+                .mobile("")
+                .status(CrewStatus.PLACEHOLDER)
+                .build();
+    }
 
     public void submitChangeOwnerRequest(String crewName, ChangeOwnerRequestDto changeOwnerRequest) throws OwnerShipChangeException {
         // is there already a request?
