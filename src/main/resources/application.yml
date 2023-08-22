@@ -69,6 +69,6 @@ logging.level:
   org.springframework.security: INFO
 okta.oauth2:
   issuer: https://ontheboat.au.auth0.com/
-  client-id: jHQGXEx9RnQ7jmPbi6a8dWY4VkwU7VBP
-  clientSecret: BRItcKT2cDbPvMxopK4bb1en4MsRDFcVoU68YKYtBJCvonjqFfI7cCsBXrW074PT
+  client-id: RJosCWS0ud43sUnb6yfcnw7la6EcfOnj
+  clientSecret: 1Np0TSceDcayIIuynb3BfVgtyeWwsq7DKn_JgiWn7agixSTpmvX02ZwOP2kMa1b2
   audience: http://marina-api:8081
