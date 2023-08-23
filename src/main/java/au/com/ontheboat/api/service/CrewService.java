@@ -5,7 +5,6 @@ import au.com.ontheboat.api.client.Userinfo;
 import au.com.ontheboat.api.model.Boat;
 import au.com.ontheboat.api.model.ChangeOwnerRequest;
 import au.com.ontheboat.api.model.Crew;
-import au.com.ontheboat.api.model.CrewStatus;
 import au.com.ontheboat.api.model.Onboard;
 import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDto;
 import au.com.ontheboat.api.model.dto.CrewOnboardRequest;
@@ -35,6 +34,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static au.com.ontheboat.api.model.CrewStatus.ACTIVE;
+import static au.com.ontheboat.api.model.CrewStatus.PLACEHOLDER;
 import static au.com.ontheboat.api.model.dto.ChangeOwnerRequestStatus.SUBMITTED;
 
 @Service
@@ -145,7 +146,7 @@ public class CrewService {
                 .firstName(userInfo.getGivenName())
                 .lastName(userInfo.getFamilyName())
                 .mobile(userInfo.getPhoneNumber())
-                .status(CrewStatus.PLACEHOLDER)
+                .status(PLACEHOLDER)
                 .build();
     }
 
@@ -169,9 +170,22 @@ public class CrewService {
         changeOwnerRequestRepository.save(request);
     }
 
-    public void save(CrewProfileResponse crewProfileResponse) {
-        Crew crew = crewRepository.findByUsername(crewProfileResponse.getUsername()).orElseThrow();
-        BeanUtils.copyProperties(crewProfileResponse, crew, "status", "ownedBoats", "username", "id");
-        crewRepository.save(crew);
+    public CrewProfileResponse save(Authentication authentication, CrewProfileResponse crewProfileResponse) {
+        if (crewProfileResponse.getStatus() == PLACEHOLDER) {
+            Crew crew = Crew.builder()
+                    .build();
+            BeanUtils.copyProperties(crewProfileResponse, crew);
+            crew.setUsername(authentication.getName());
+            crew.setStatus(ACTIVE);
+            crew.setRoles("USER");
+            Crew savedCrew = crewRepository.save(crew);
+            BeanUtils.copyProperties(savedCrew, crewProfileResponse);
+        } else {
+            Crew crew = crewRepository.findByUsername(crewProfileResponse.getUsername()).orElseThrow();
+            BeanUtils.copyProperties(crewProfileResponse, crew, "status", "ownedBoats", "username", "id");
+            crew = crewRepository.save(crew);
+            BeanUtils.copyProperties(crew, crewProfileResponse);
+        }
+        return crewProfileResponse;
     }
 }

@@ -82,9 +82,10 @@ public class CrewController {
     }
 
     @PutMapping(value = "/profile", consumes = "application/json")
-    public ResponseEntity updateUser(@RequestBody CrewProfileResponse crewProfileResponse) {
-        crewService.save(crewProfileResponse);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CrewProfileResponse> updateUser(@RequestBody CrewProfileResponse crewProfileResponse) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CrewProfileResponse response = crewService.save(authentication, crewProfileResponse);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/onboard")
