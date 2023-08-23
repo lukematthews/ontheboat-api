@@ -142,9 +142,9 @@ public class CrewService {
         return CrewProfileResponse.builder()
                 .id(-1L)
                 .email(userInfo.getEmail())
-                .firstName("")
-                .lastName("")
-                .mobile("")
+                .firstName(userInfo.getGivenName())
+                .lastName(userInfo.getFamilyName())
+                .mobile(userInfo.getPhoneNumber())
                 .status(CrewStatus.PLACEHOLDER)
                 .build();
     }

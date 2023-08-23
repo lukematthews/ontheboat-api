@@ -21,6 +21,7 @@ logging:
     org:
       springframework:
         security: TRACE
+    au.com.ontheboat.api.client: DEBUG
 okta.oauth2:
   issuer: https://ontheboat.au.auth0.com/
   client-id: jHQGXEx9RnQ7jmPbi6a8dWY4VkwU7VBP
@@ -31,7 +32,7 @@ okta.oauth2:
 #    generate-ddl: true
 #    hibernate:
 #      ddl-auto: create
-
+feign.client.config.default.loggerLevel: FULL
 application:
   security:
     jwt:
