@@ -67,7 +67,7 @@ au.com.ontheboat.api:
   photos.path: "/data/photos-combined/"
 
 logging.level:
-  org.springframework.security: INFO
+  org.springframework.security: TRACE
 okta.oauth2:
   issuer: https://ontheboatp.au.auth0.com/
   client-id: RJosCWS0ud43sUnb6yfcnw7la6EcfOnj
