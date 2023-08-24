@@ -147,6 +147,7 @@ public class CrewService {
                 .lastName(userInfo.getFamilyName())
                 .mobile(userInfo.getPhoneNumber())
                 .status(PLACEHOLDER)
+                .ownedBoats(List.of())
                 .build();
     }
 
