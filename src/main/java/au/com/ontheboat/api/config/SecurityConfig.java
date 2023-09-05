@@ -40,9 +40,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        http.csrf((csrf) -> csrf
-                .ignoringRequestMatchers("/marina/**")
-        );
+//        http.csrf((csrf) -> csrf
+//                .ignoringRequestMatchers("/marina/**")
+//        );
         http.cors(cors -> cors.disable());
         http.authorizeHttpRequests((requests) -> requests
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/marina/**")).permitAll()

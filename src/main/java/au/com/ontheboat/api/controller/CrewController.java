@@ -1,9 +1,11 @@
 package au.com.ontheboat.api.controller;
 
+import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDetailDto;
 import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDto;
 import au.com.ontheboat.api.model.dto.CrewOnboardRequest;
 import au.com.ontheboat.api.model.dto.CrewProfileResponse;
 import au.com.ontheboat.api.model.dto.OnboardResponse;
+import au.com.ontheboat.api.model.dto.OwnershipChangeAction;
 import au.com.ontheboat.api.model.dto.SignonDto;
 import au.com.ontheboat.api.service.CrewService;
 import au.com.ontheboat.api.service.OwnerShipChangeException;
@@ -59,7 +61,6 @@ public class CrewController {
     }
 
     @GetMapping("/profile")
-//    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<CrewProfileResponse> getProfileForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
@@ -71,6 +72,19 @@ public class CrewController {
         }
     }
 
+    @GetMapping("/ownership-requests")
+    public ResponseEntity<List<ChangeOwnerRequestDetailDto>> getOwnershipChangeRequests(Authentication authentication) {
+        List<ChangeOwnerRequestDetailDto> submittedRequests = crewService.findAllOwnershipRequestsLodgedBy(authentication.getName());
+        return ResponseEntity.ok(submittedRequests);
+    }
+
+    @GetMapping("/all-ownership-requests")
+    public ResponseEntity<List<ChangeOwnerRequestDetailDto>> getallOwnershipChangeRequests(Authentication authentication) {
+        List<ChangeOwnerRequestDetailDto> allRequests = crewService.findAllOwnershipRequests();
+        return ResponseEntity.ok(allRequests);
+    }
+
+
     @PostMapping(value = "/request-ownership-change", consumes = "application/json")
     public ResponseEntity changeOwner(Authentication authentication, @RequestBody ChangeOwnerRequestDto changeOwnerRequest) {
         try {
@@ -79,6 +93,12 @@ public class CrewController {
         } catch (OwnerShipChangeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @PostMapping(value = "/action-ownership-change", consumes = "application/json")
+    public ResponseEntity actionOwnershipChange(Authentication authentication, @RequestBody OwnershipChangeAction ownershipChangeAction) {
+        crewService.performOwnershipChangeAction(authentication.getName(), ownershipChangeAction);
+        return ResponseEntity.ok("");
     }
 
     @PutMapping(value = "/profile", consumes = "application/json")

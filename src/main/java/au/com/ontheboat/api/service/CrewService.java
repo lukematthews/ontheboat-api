@@ -6,10 +6,12 @@ import au.com.ontheboat.api.model.Boat;
 import au.com.ontheboat.api.model.ChangeOwnerRequest;
 import au.com.ontheboat.api.model.Crew;
 import au.com.ontheboat.api.model.Onboard;
+import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDetailDto;
 import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDto;
 import au.com.ontheboat.api.model.dto.CrewOnboardRequest;
 import au.com.ontheboat.api.model.dto.CrewProfileResponse;
 import au.com.ontheboat.api.model.dto.OnboardResponse;
+import au.com.ontheboat.api.model.dto.OwnershipChangeAction;
 import au.com.ontheboat.api.model.dto.ProfileBoatResponse;
 import au.com.ontheboat.api.model.dto.SignUpRequest;
 import au.com.ontheboat.api.model.dto.SignonDto;
@@ -20,6 +22,7 @@ import au.com.ontheboat.api.repository.OnboardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -36,6 +40,7 @@ import java.util.stream.Collectors;
 
 import static au.com.ontheboat.api.model.CrewStatus.ACTIVE;
 import static au.com.ontheboat.api.model.CrewStatus.PLACEHOLDER;
+import static au.com.ontheboat.api.model.dto.ChangeOwnerRequestStatus.APPROVED;
 import static au.com.ontheboat.api.model.dto.ChangeOwnerRequestStatus.SUBMITTED;
 
 @Service
@@ -158,7 +163,7 @@ public class CrewService {
 
         List<ChangeOwnerRequest> existingRequests = changeOwnerRequestRepository.findAll(Example.of(ChangeOwnerRequest.builder().boat(requestedBoat).crew(requestingCrew).build()));
         if (existingRequests.isEmpty() == false) {
-            throw new OwnerShipChangeException("Ownership change request already exists");
+            throw new OwnerShipChangeException("Ownership change request already exists.");
         }
         ChangeOwnerRequest request = ChangeOwnerRequest.builder()
                 .status(SUBMITTED)
@@ -188,5 +193,52 @@ public class CrewService {
             BeanUtils.copyProperties(crew, crewProfileResponse);
         }
         return crewProfileResponse;
+    }
+
+    public List<ChangeOwnerRequestDetailDto> findAllOwnershipRequestsLodgedBy(String name) {
+        Crew crew = crewRepository.findByUsername(name).orElseThrow();
+        return crew.getChangeOwnerRequests().stream().map(request -> ChangeOwnerRequestDetailDto.builder()
+                        .boatName(request.getBoat().getBoatName())
+                        .status(request.getStatus())
+                        .submitted(request.getSubmitted().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).build())
+                .collect(Collectors.toList());
+    }
+
+    public List<ChangeOwnerRequestDetailDto> findAllOwnershipRequests() {
+        return changeOwnerRequestRepository.findAll(Sort.by(Sort.Direction.DESC, "submitted")).stream()
+                .map(request -> ChangeOwnerRequestDetailDto.builder()
+                        .id(request.getId())
+                        .boatName(request.getBoat() != null ? request.getBoat().getBoatName() : "")
+                        .status(request.getStatus())
+                        .submitted(request.getSubmitted().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).build())
+                .collect(Collectors.toList());
+    }
+
+    public void performOwnershipChangeAction(String name, OwnershipChangeAction ownershipChangeAction) {
+        ChangeOwnerRequest changeOwnerRequest = changeOwnerRequestRepository.findById(ownershipChangeAction.getId()).get();
+        switch (ownershipChangeAction.getAction()) {
+            case APPROVED -> performApprovedRequest(changeOwnerRequest);
+
+        }
+    }
+
+    private void performApprovedRequest(ChangeOwnerRequest changeOwnerRequest) {
+        Boat boat = changeOwnerRequest.getBoat();
+        Set<Crew> owners = boat.getOwners();
+        switch (changeOwnerRequest.getRequestType()) {
+            case REMOVE:
+                owners.remove(changeOwnerRequest.getCrew());
+                break;
+            case PARTNER:
+                owners.add(changeOwnerRequest.getCrew());
+                break;
+            case SOLE_OWNER:
+                owners.clear();
+                owners.add(changeOwnerRequest.getCrew());
+                break;
+        }
+        boatRepository.save(boat);
+        changeOwnerRequest.setStatus(APPROVED);
+        changeOwnerRequestRepository.save(changeOwnerRequest);
     }
 }
