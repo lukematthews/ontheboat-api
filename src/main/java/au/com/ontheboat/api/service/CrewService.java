@@ -8,6 +8,7 @@ import au.com.ontheboat.api.model.Crew;
 import au.com.ontheboat.api.model.Onboard;
 import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDetailDto;
 import au.com.ontheboat.api.model.dto.ChangeOwnerRequestDto;
+import au.com.ontheboat.api.model.dto.ChangeOwnerRequestStatus;
 import au.com.ontheboat.api.model.dto.CrewOnboardRequest;
 import au.com.ontheboat.api.model.dto.CrewProfileResponse;
 import au.com.ontheboat.api.model.dto.OnboardResponse;
@@ -21,7 +22,6 @@ import au.com.ontheboat.api.repository.CrewRepository;
 import au.com.ontheboat.api.repository.OnboardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -161,7 +161,7 @@ public class CrewService {
         Crew requestingCrew = crewRepository.findByUsername(crewName).orElseThrow(() -> new OwnerShipChangeException("Submitting crew not found"));
         Boat requestedBoat = boatRepository.findById(changeOwnerRequest.getBoatId()).orElseThrow(() -> new OwnerShipChangeException("Boat not found"));
 
-        List<ChangeOwnerRequest> existingRequests = changeOwnerRequestRepository.findAll(Example.of(ChangeOwnerRequest.builder().boat(requestedBoat).crew(requestingCrew).build()));
+        List<ChangeOwnerRequest> existingRequests = changeOwnerRequestRepository.findAllSubmittedByUser(requestedBoat, requestingCrew);
         if (existingRequests.isEmpty() == false) {
             throw new OwnerShipChangeException("Ownership change request already exists.");
         }
@@ -218,23 +218,38 @@ public class CrewService {
         ChangeOwnerRequest changeOwnerRequest = changeOwnerRequestRepository.findById(ownershipChangeAction.getId()).get();
         switch (ownershipChangeAction.getAction()) {
             case APPROVED -> performApprovedRequest(changeOwnerRequest);
-
+            case DECLINED -> performDeclineRequest(changeOwnerRequest);
+            case CANCELLED -> performCancelRequest(changeOwnerRequest);
         }
+    }
+
+    private void performCancelRequest(ChangeOwnerRequest changeOwnerRequest) {
+        changeOwnerRequest.setStatus(ChangeOwnerRequestStatus.CANCELLED);
+        changeOwnerRequestRepository.save(changeOwnerRequest);
+    }
+
+    private void performDeclineRequest(ChangeOwnerRequest changeOwnerRequest) {
+        changeOwnerRequest.setStatus(ChangeOwnerRequestStatus.REJECTED);
+        changeOwnerRequestRepository.save(changeOwnerRequest);
     }
 
     private void performApprovedRequest(ChangeOwnerRequest changeOwnerRequest) {
         Boat boat = changeOwnerRequest.getBoat();
         Set<Crew> owners = boat.getOwners();
+        String description = null;
         switch (changeOwnerRequest.getRequestType()) {
             case REMOVE:
                 owners.remove(changeOwnerRequest.getCrew());
+                description = String.format("Removed %s as an owner of %s", changeOwnerRequest.getCrew().getFirstName() + " " + changeOwnerRequest.getCrew().getLastName(), boat.getBoatName());
                 break;
             case PARTNER:
                 owners.add(changeOwnerRequest.getCrew());
+                description = String.format("Added %s as an owner of %s", changeOwnerRequest.getCrew().getFirstName() + " " + changeOwnerRequest.getCrew().getLastName(), boat.getBoatName());
                 break;
             case SOLE_OWNER:
                 owners.clear();
                 owners.add(changeOwnerRequest.getCrew());
+                description = String.format("%s is the sole owner of %s", changeOwnerRequest.getCrew().getFirstName() + " " + changeOwnerRequest.getCrew().getLastName(), boat.getBoatName());
                 break;
         }
         boatRepository.save(boat);

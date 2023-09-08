@@ -1,6 +1,7 @@
 package au.com.ontheboat.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,6 +62,7 @@ public class Crew implements UserDetails {
             name = "boat_owners",
             joinColumns = @JoinColumn(name = "crew_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "boat_id", referencedColumnName = "id"))
+    @JsonManagedReference
     private Set<Boat> ownedBoats;
 
     @Column(name = "roles", nullable = false)
@@ -71,6 +73,8 @@ public class Crew implements UserDetails {
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = EAGER)
     @JoinColumn(name = "crew_id")
+    @ToString.Exclude
+    @JsonManagedReference
     private Set<ChangeOwnerRequest> changeOwnerRequests;
 
     @Override

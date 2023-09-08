@@ -3,6 +3,9 @@ package au.com.ontheboat.api.model.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Builder
 @Data
 public class ChangeOwnerRequestDetailDto {
@@ -10,4 +13,9 @@ public class ChangeOwnerRequestDetailDto {
     private ChangeOwnerRequestStatus status;
     private String boatName;
     private String submitted;
+
+    private String crewName;
+    private String submittedBy;
+    @Builder.Default
+    private List<AuditEntryDto> auditEntries = new ArrayList<>();
 }

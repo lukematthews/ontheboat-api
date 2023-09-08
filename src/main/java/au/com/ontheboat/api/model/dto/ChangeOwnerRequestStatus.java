@@ -10,7 +10,8 @@ public enum ChangeOwnerRequestStatus {
     SUBMITTED("submitted"),
     IN_PROGRESS("inProgress"),
     APPROVED("approved"),
-    REJECTED("rejected");
+    REJECTED("rejected"),
+    CANCELLED("cancelled");
 
     @Getter
     private String status;

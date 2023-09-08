@@ -16,6 +16,19 @@ spring:
     password: ontheboat
   hibernate:
     dialect: org.hibernate.dialect.PostgreSQLDialect
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            scripts:
+              action: create
+              create-target: create.sql
+  flyway:
+    baselineOnMigrate: true
 logging:
   level:
     org:
@@ -27,11 +40,8 @@ okta.oauth2:
   client-id: jHQGXEx9RnQ7jmPbi6a8dWY4VkwU7VBP
   clientSecret: BRItcKT2cDbPvMxopK4bb1en4MsRDFcVoU68YKYtBJCvonjqFfI7cCsBXrW074PT
   audience: http://marina-api:8081
-
-#  jpa:
-#    generate-ddl: true
-#    hibernate:
-#      ddl-auto: create
+  groupsClaim: permissions
+javers.newObjectSnapshot: true
 feign.client.config.default.loggerLevel: FULL
 application:
   security:
@@ -53,14 +63,16 @@ javax:
   persistence:
     schema-generation:
       scripts:
+        action: create
         create-target: create.sql
+
 ---
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://ontheboat-postgres:5432/ontheboat
+    url: jdbc:postgresql://host.docker.internal:5432/ontheboat
   username: ontheboat
   password: ontheboat
 au.com.ontheboat.api:
