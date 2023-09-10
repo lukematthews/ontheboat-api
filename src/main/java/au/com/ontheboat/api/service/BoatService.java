@@ -1,10 +1,13 @@
 package au.com.ontheboat.api.service;
 
 import au.com.ontheboat.api.model.Boat;
+import au.com.ontheboat.api.model.BoatDetails;
 import au.com.ontheboat.api.model.BoatMedia;
 import au.com.ontheboat.api.model.Crew;
 import au.com.ontheboat.api.model.dto.BoatDto;
+import au.com.ontheboat.api.model.dto.BoatUpdateDto;
 import au.com.ontheboat.api.model.dto.CrewProfileResponse;
+import au.com.ontheboat.api.repository.BoatDetailsRepository;
 import au.com.ontheboat.api.repository.BoatMediaRepository;
 import au.com.ontheboat.api.repository.BoatRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,10 @@ public class BoatService {
     private BoatRepository boatRepository;
     @Autowired
     private BoatMediaRepository boatMediaRepository;
+    @Autowired
+    private BoatDetailsRepository boatDetailsRepository;
+    @Autowired
+    private CrewService crewService;
 
     public Page<Boat> getAllBoats(Pageable page) {
         log.info(page.toString());
@@ -74,4 +81,25 @@ public class BoatService {
         return boatRepository.findByExternalId(boatId.toString());
     }
 
+    public boolean isCrewOwner(BoatUpdateDto boat, String name) {
+        Crew crew = crewService.findCrewByUsername(name);
+        Boat boatToUpdate = boatRepository.findById(boat.getId()).get();
+        return boatToUpdate.getOwners().contains(crew);
+    }
+
+    public void updateBoat(BoatUpdateDto boat) {
+        Boat boatToUpdate = boatRepository.findById(boat.getId()).get();
+        BeanUtils.copyProperties(boat, boatToUpdate);
+        BoatDetails details = boatToUpdate.getBoatDetails();
+        if (details == null) {
+            details = BoatDetails.builder().build();
+            BeanUtils.copyProperties(boat, details, "id");
+            details = boatDetailsRepository.save(details);
+            boatToUpdate.setBoatDetails(details);
+        } else {
+            BeanUtils.copyProperties(boat, details, "id");
+        }
+
+        boatRepository.save(boatToUpdate);
+    }
 }

@@ -117,6 +117,10 @@ public class CrewService {
         return crewRepository.findById(id).orElse(null);
     }
 
+    public Crew findCrewByUsername(String username) {
+        return crewRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username + "is not registered"));
+    }
+
     public Crew register(SignUpRequest user) {
         Crew crew = Crew.builder().email(user.getEmail())
                 .firstName(user.getFirstName())
@@ -129,7 +133,7 @@ public class CrewService {
     }
 
     public CrewProfileResponse getProfile(String username) {
-        Crew crew = crewRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username + "is not registered"));
+        Crew crew = findCrewByUsername(username);
         return CrewProfileResponse.builder()
                 .id(crew.getId())
                 .username(crew.getUsername())
