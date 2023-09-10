@@ -141,7 +141,12 @@ public class CrewService {
                 .lastName(crew.getLastName())
                 .mobile(crew.getMobile())
                 .email(crew.getEmail())
-                .ownedBoats(crew.getOwnedBoats().stream().map(b -> ProfileBoatResponse.builder().boatName(b.getBoatName()).id(b.getId()).build()).toList())
+                .ownedBoats(crew.getOwnedBoats().stream().map(b -> ProfileBoatResponse.builder()
+                                .boatName(b.getBoatName())
+                                .id(b.getId())
+                                .externalId(b.getExternalId())
+                                .build())
+                        .toList())
                 .status(crew.getStatus())
                 .build();
     }

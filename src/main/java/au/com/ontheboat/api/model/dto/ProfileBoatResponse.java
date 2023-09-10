@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ProfileBoatResponse {
     private Long id;
     private String boatName;
+    private String externalId;
 }
