@@ -85,3 +85,4 @@ okta.oauth2:
   client-id: RJosCWS0ud43sUnb6yfcnw7la6EcfOnj
   clientSecret: 1Np0TSceDcayIIuynb3BfVgtyeWwsq7DKn_JgiWn7agixSTpmvX02ZwOP2kMa1b2
   audience: http://marina-api:8081
+  groupsClaim: permissions
