@@ -72,7 +72,7 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5432/ontheboat
+    url: jdbc:postgresql://ontheboat-postgres:5432/ontheboat
   username: ontheboat
   password: ontheboat
 au.com.ontheboat.api:
