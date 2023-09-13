@@ -1,5 +1,6 @@
 package au.com.ontheboat.api.controller;
 
+import au.com.ontheboat.api.model.dto.ActionResponse;
 import au.com.ontheboat.api.model.dto.BoatUpdateDto;
 import au.com.ontheboat.api.service.BoatService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,6 @@ public class BoatController {
             return new ResponseEntity<>("user does not own boat", HttpStatus.FORBIDDEN);
         }
         boatService.updateBoat(boat);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ActionResponse.SAVE_SUCCESS);
     }
 }
