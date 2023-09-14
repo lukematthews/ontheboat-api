@@ -16,6 +16,8 @@ public class ChangeOwnerRequestDetailDto {
 
     private String crewName;
     private String submittedBy;
+
+    private ChangeOwnerRequestType requestType;
     @Builder.Default
     private List<AuditEntryDto> auditEntries = new ArrayList<>();
 }

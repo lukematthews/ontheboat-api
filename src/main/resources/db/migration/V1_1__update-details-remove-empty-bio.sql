@@ -1,0 +1,1 @@
+update boat_details set bio = null where bio = 'No boat bio information at this time.';

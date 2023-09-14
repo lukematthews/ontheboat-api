@@ -209,6 +209,7 @@ public class CrewService {
         return crew.getChangeOwnerRequests().stream().map(request -> ChangeOwnerRequestDetailDto.builder()
                         .boatName(request.getBoat().getBoatName())
                         .status(request.getStatus())
+                        .requestType(request.getRequestType())
                         .submitted(request.getSubmitted().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).build())
                 .collect(Collectors.toList());
     }
@@ -219,6 +220,8 @@ public class CrewService {
                         .id(request.getId())
                         .boatName(request.getBoat() != null ? request.getBoat().getBoatName() : "")
                         .status(request.getStatus())
+                        .requestType(request.getRequestType())
+                        .submittedBy(request.getCrew().getFirstName() + " " + request.getCrew().getLastName())
                         .submitted(request.getSubmitted().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).build())
                 .collect(Collectors.toList());
     }

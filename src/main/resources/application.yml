@@ -28,7 +28,11 @@ spring:
               action: create
               create-target: create.sql
   flyway:
+    enabled: true
     baselineOnMigrate: true
+    url: 'jdbc:postgresql://localhost:5432/ontheboat'
+    password: ontheboat
+    user: ontheboat
 logging:
   level:
     org:
