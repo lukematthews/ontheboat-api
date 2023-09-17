@@ -69,6 +69,12 @@ spring:
     url: jdbc:postgresql://ontheboat-postgres:5432/ontheboat
   username: ontheboat
   password: ontheboat
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    url: 'jdbc:postgresql://ontheboat-postgres:5432/ontheboat'
+    password: ontheboat
+    user: ontheboat
 au.com.ontheboat.api:
   photos.path: "/data/photos-combined/"
 
